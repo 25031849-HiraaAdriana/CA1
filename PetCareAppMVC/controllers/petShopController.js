@@ -2,6 +2,7 @@ const fs = require('fs/promises');
 const path = require('path');
 const { randomUUID } = require('crypto');
 const petShopModel = require('../models/petShopModel');
+const { storedPetShopBrandName } = require('../helpers/petShopBrandName');
 const adminActivityModel = require('../models/adminActivityModel');
 const privatePetShopStorage = require('../helpers/privatePetShopStorage');
 
@@ -74,7 +75,9 @@ function parseProductForm(body, isExisting = false) {
       : null,
     trustedBrandId: null,
     productName: getText(body.product_name, 180),
-    brand: getText(body.trusted_brand_name, 120) || getText(body.brand, 120) || null,
+    brand: storedPetShopBrandName(
+      getText(body.trusted_brand_name, 120) || getText(body.brand, 120) || null
+    ),
     description: getText(body.description, 10000),
     intendedPurpose: getText(body.intended_purpose, 500) || null,
     price,

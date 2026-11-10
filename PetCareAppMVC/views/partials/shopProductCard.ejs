@@ -18,7 +18,7 @@
     </form>
   <% } %>
   <div class="shop-product-copy">
-    <% if (product.brand) { %><p class="shop-product-brand"><%= product.brand %></p><% } %>
+    <% if (product.brand) { %><p class="shop-product-brand"><%= displayPetShopBrandName(product.brand) %></p><% } %>
     <h3><a href="/shop/products/<%= product.id %>"><%= product.product_name %></a></h3>
     <p class="shop-product-description"><%= product.description %></p>
     <p class="shop-product-suitability"><%= Array.isArray(product.species_suitability) ? product.species_suitability.join(', ') : '' %>

@@ -32,7 +32,7 @@
             <div class="shop-admin-product-content">
               <div class="shop-admin-product-title">
                 <h2><%= product.product_name %></h2>
-                <span class="shop-admin-brand-badge"><%= product.trusted_brand_name || product.brand || 'No brand' %></span>
+                <span class="shop-admin-brand-badge"><%= displayPetShopBrandName(product.trusted_brand_name || product.brand || 'No brand') %></span>
               </div>
               <p class="shop-admin-product-category"><%= product.category_name %></p>
               <dl class="shop-admin-product-details">
@@ -50,7 +50,7 @@
                   <div><dt>Placement</dt><dd><%= product.storefront_placement === 'pethub_products'
                     ? 'Pomi Products'
                     : product.trusted_brand_name
-                      ? `${product.trusted_brand_name} · ${product.storefront_placement === 'trusted_cats_dogs' ? 'Cats & Dogs' : 'Small Furries'}`
+                      ? `${displayPetShopBrandName(product.trusted_brand_name)} · ${product.storefront_placement === 'trusted_cats_dogs' ? 'Cats & Dogs' : 'Small Furries'}`
                       : 'Not on storefront' %></dd></div>
                 </dl>
               </details>

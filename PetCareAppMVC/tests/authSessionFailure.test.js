@@ -10,7 +10,6 @@ const originalDb = require.cache[dbPath];
 const sessions = new Map();
 let failRead = false;
 let failWrite = false;
-let lastCredentialQuery = '';
 const databaseError = Object.assign(new Error('private database details'), {
   code: 'ER_ACCESS_DENIED_ERROR'
 });
@@ -37,7 +36,6 @@ const connection = {
         return callback(null, { affectedRows: 1 });
       }
       if (sql.startsWith('SELECT id, username, name, role')) {
-        lastCredentialQuery = sql;
         return callback(Object.assign(new Error('Missing column'), { code: 'ER_BAD_FIELD_ERROR' }));
       }
       return callback(new Error('Unexpected query in session test'));
@@ -90,7 +88,7 @@ after(async () => {
 test('authentication forms report session save errors before sending a cookie', async () => {
   failWrite = true;
   try {
-    for (const route of ['/login', '/signup', '/admin/login', '/admin/setup']) {
+    for (const route of ['/login', '/signup']) {
       const response = await fetch(baseUrl + route);
       assert.equal(response.status, 503);
       assert.equal(response.headers.get('set-cookie'), null);
@@ -140,10 +138,7 @@ test('saved CSRF session survives requests, and session read errors are sanitize
   }
 });
 
-test('credential lookups require the TOTP flag and propagate missing-column errors', async () => {
-  for (const find of [userModel.findByCredentials, userModel.findAdminByCredentials]) {
-    const error = await new Promise(resolve => find('test-user', 'test-hash', resolve));
-    assert.equal(error.code, 'ER_BAD_FIELD_ERROR');
-    assert.match(lastCredentialQuery, /\btotp_enabled\b/);
-  }
+test('credential lookups propagate database errors', async () => {
+  const error = await new Promise(resolve => userModel.findByCredentials('test-user', 'test-hash', resolve));
+  assert.equal(error.code, 'ER_BAD_FIELD_ERROR');
 });

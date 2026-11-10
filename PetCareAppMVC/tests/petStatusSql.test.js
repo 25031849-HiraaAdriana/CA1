@@ -44,7 +44,6 @@ const appointmentModel = require('../models/appointmentModel');
 const petShopModel = require('../models/petShopModel');
 const medicalRecordModel = require('../models/medicalRecordModel');
 const medicationRefillModel = require('../models/medicationRefillModel');
-const journalModel = require('../models/journalModel');
 
 test('active pet selection is enforced for dashboard, appointments and Pet Shop suggestions', async () => {
   sharedCalls.length = 0;
@@ -63,13 +62,12 @@ test('active pet selection is enforced for dashboard, appointments and Pet Shop 
   }
 });
 
-test('owner medical record and journal lookup queries exclude inactive pets', async () => {
+test('owner medical record lookup queries exclude inactive pets', async () => {
   sharedCalls.length = 0;
   await medicalRecordModel.getOwnerPetById(8, 7);
   await medicalRecordModel.getPublishedRecordsForOwnerPet(8, 7);
   await medicalRecordModel.getPublishedRecordForOwnerPet(8, 3, 7);
   await medicalRecordModel.getPublishedRecordDocumentForOwnerPet(8, 3, 7);
-  journalModel.getJournalsByOwner(7, () => {});
 
   for (const call of sharedCalls.filter(call => /JOIN pets|FROM pets/.test(call.sql))) {
     assert.match(call.sql, /status = 'active'/);

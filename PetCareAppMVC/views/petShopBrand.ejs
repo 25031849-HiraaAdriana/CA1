@@ -1,10 +1,11 @@
+<% const brandDisplayName = brand ? displayPetShopBrandName(brand.brand_name) : 'Trusted Brand'; %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Browse eligible <%= brand ? brand.brand_name : 'trusted brand' %> products at Pomi.">
-  <title><%= brand ? brand.brand_name : 'Trusted Brand' %> | Pomi</title>
+  <meta name="description" content="Browse eligible <%= brandDisplayName %> products at Pomi.">
+  <title><%= brandDisplayName %> | Pomi</title>
   <script src="/js/pet-shop.js" defer></script>
 </head>
 <body class="shop-page shop-brand-page">
@@ -20,28 +21,28 @@
       <nav class="shop-breadcrumb" aria-label="Breadcrumb">
         <a href="/shop">Pet Shop</a><span aria-hidden="true">/</span>
         <a href="/shop#trusted-brands-title">Trusted Brands</a><span aria-hidden="true">/</span>
-        <span aria-current="page"><%= brand.brand_name %></span>
+        <span aria-current="page"><%= brandDisplayName %></span>
       </nav>
       <% if (errorMessage) { %><p class="shop-notice shop-notice-error" role="alert"><%= errorMessage %></p><% } %>
       <% if (typeof catalogueErrorMessage !== 'undefined' && catalogueErrorMessage) { %><p class="shop-notice shop-notice-error" role="alert"><%= catalogueErrorMessage %></p><% } %>
       <% if (successMessage) { %><p class="shop-notice" role="status"><%= successMessage %></p><% } %>
       <header class="shop-brand-header">
         <p class="shop-eyebrow"><%= brand.storefront_group === 'cats_dogs' ? 'Cats & Dogs Trusted Brands' : 'Small Furries Trusted Brands' %></p>
-        <h1><%= brand.brand_name %></h1>
+        <h1><%= brandDisplayName %></h1>
         <p>Eligible products stored by Pomi.</p>
       </header>
       <section class="shop-section shop-brand-products" aria-labelledby="brand-products-title">
         <div class="shop-section-heading">
           <div>
             <p class="shop-eyebrow">Browse this brand</p>
-            <h2 id="brand-products-title"><%= brand.brand_name %> Products</h2>
+            <h2 id="brand-products-title"><%= brandDisplayName %> Products</h2>
           </div>
           <p><%= products.length %> matching product<%= products.length === 1 ? '' : 's' %></p>
         </div>
         <form class="shop-filters shop-storefront-filters" method="get" action="/shop/brands/<%= encodeURIComponent(brand.brand_code) %>">
           <label>
             <span>Search Products</span>
-            <input type="search" name="search" value="<%= filters.search || '' %>" placeholder="Search <%= brand.brand_name %> products">
+            <input type="search" name="search" value="<%= filters.search || '' %>" placeholder="Search <%= brandDisplayName %> products">
           </label>
           <label>
             <span>Age Category</span>
@@ -49,15 +50,6 @@
               <option value="">Any age suitability</option>
               <option value="age-limited" <%= filters.ageCategory === 'age-limited' ? 'selected' : '' %>>Age range recorded</option>
               <option value="no-age-limit" <%= filters.ageCategory === 'no-age-limit' ? 'selected' : '' %>>No age limit recorded</option>
-            </select>
-          </label>
-          <label>
-            <span>Animal Species</span>
-            <select name="species">
-              <option value="">All species</option>
-              <% speciesOptions.forEach(species => { %>
-                <option value="<%= species %>" <%= filters.species === species ? 'selected' : '' %>><%= species %></option>
-              <% }); %>
             </select>
           </label>
           <label>
@@ -70,11 +62,11 @@
           </label>
           <button class="shop-button shop-button-dark" type="submit">Search</button>
         </form>
-        <p class="shop-filter-note">Age options reflect recorded suitability in months for the selected species; they do not imply veterinary age categories.</p>
+        <p class="shop-filter-note">Age options reflect recorded suitability in months; they do not imply veterinary age categories.</p>
         <% if (!products.length) { %>
           <p class="shop-empty" role="status"><%= typeof catalogueErrorMessage !== 'undefined' && catalogueErrorMessage
             ? 'Product details are temporarily unavailable.'
-            : `No eligible ${brand.brand_name} products are currently listed.` %></p>
+            : `No eligible ${brandDisplayName} products are currently listed.` %></p>
         <% } else { %>
           <div class="shop-product-grid">
             <% products.forEach(product => { %>

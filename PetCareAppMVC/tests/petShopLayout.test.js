@@ -1,6 +1,7 @@
 const assert = require('node:assert/strict');
 const fs = require('node:fs/promises');
 const path = require('node:path');
+const vm = require('node:vm');
 const { test } = require('node:test');
 
 const root = path.join(__dirname, '..');
@@ -20,6 +21,14 @@ test('Shop and Dashboard styles define compact desktop and responsive mobile lay
   assert.match(shopCss, /\.shop-product-image\s*\{[^}]*width:\s*100%;[^}]*aspect-ratio:\s*1\s*\/\s*1/s);
   assert.match(shopCss, /\.shop-product-image img\s*\{[^}]*width:\s*100%;[^}]*height:\s*100%;[^}]*object-fit:\s*contain/s);
   assert.match(shopCss, /\.shop-brand-logo-link img\[hidden\],\s*\.shop-store-logo-link img\[hidden\]\s*\{[^}]*display:\s*none/s);
+  assert.match(shopCss, /\.shop-brand-logo-link img,\s*\.shop-store-logo-link img\s*\{[^}]*width:\s*min\(100%,\s*150px\);[^}]*height:\s*58px;[^}]*object-fit:\s*contain/s);
+  assert.match(shopCss, /\.shop-brand-logo-link:focus-visible/);
+  assert.match(shopCss, /\.shop-store-logo-link:focus-visible/);
+  assert.match(shopCss, /\.shop-brand-grid\s*\{[^}]*display:\s*flex;[^}]*flex-wrap:\s*wrap/s);
+  assert.match(shopCss, /\.shop-alternative-grid\s*\{[^}]*display:\s*flex;[^}]*flex-wrap:\s*wrap/s);
+  assert.match(shopCss, /@media\s*\(max-width:\s*620px\)[\s\S]*?\.shop-brand-logo-link\s*\{[^}]*flex-basis:\s*calc\(50% - 10px\)/);
+  assert.match(shopCss, /@media\s*\(max-width:\s*620px\)[\s\S]*?\.shop-store-logo-link\s*\{[^}]*flex-basis:\s*100%/);
+  assert.match(shopCss, /@media\s*\(prefers-reduced-motion:\s*reduce\)[\s\S]*?\.shop-brand-logo-link,[\s\S]*?\.shop-store-logo-link\s*\{[^}]*transition:\s*none/);
   assert.match(dashboardCss, /grid-template-columns:\s*repeat\(auto-fill,\s*minmax\(180px,\s*195px\)\)/);
   assert.match(dashboardCss, /\.dashboard-shop-image-wrap\s*\{[^}]*width:\s*100%;[^}]*aspect-ratio:\s*1\s*\/\s*1/s);
   assert.match(dashboardCss, /\.dashboard-shop-image-wrap img\s*\{[^}]*width:\s*100%;[^}]*height:\s*100%;[^}]*object-fit:\s*contain/s);
@@ -32,4 +41,37 @@ test('Shop and Dashboard styles define compact desktop and responsive mobile lay
   assert.match(adminCss, /\.pomi-admin-dashboard-card\s*\{[^}]*min-height:\s*112px;[^}]*border-radius:\s*22px/s);
   assert.match(adminCss, /\.pomi-admin-dashboard-card:focus-visible/);
   assert.match(adminCss, /\.pomi-admin-dashboard-card:active/);
+});
+
+test('brand logo displays on load and falls back to text on image failure', async () => {
+  const script = await fs.readFile(path.join(root, 'public', 'js', 'pet-shop.js'), 'utf8');
+  for (const cached of [false, true]) {
+    const listeners = {};
+    const fallback = { hidden: false };
+    const image = {
+      hidden: true,
+      complete: cached,
+      naturalWidth: cached ? 100 : 0,
+      parentElement: { querySelector: () => fallback },
+      addEventListener: (event, handler) => { listeners[event] = handler; }
+    };
+    const document = {
+      querySelector: () => null,
+      querySelectorAll: selector => selector === '[data-logo-image]' ? [image] : []
+    };
+    vm.runInNewContext(script, {
+      document,
+      window: { matchMedia: () => ({ matches: true }) }
+    });
+    if (!cached) {
+      assert.equal(image.hidden, true);
+      assert.equal(fallback.hidden, false);
+      listeners.load();
+    }
+    assert.equal(image.hidden, false);
+    assert.equal(fallback.hidden, true);
+    listeners.error();
+    assert.equal(image.hidden, true);
+    assert.equal(fallback.hidden, false);
+  }
 });

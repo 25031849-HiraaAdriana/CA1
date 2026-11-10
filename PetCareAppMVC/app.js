@@ -1,6 +1,7 @@
-// Pet Care Journal System
+// Pomi application
 const { loadEnvironment, requireSessionSecret } = require('./config/environment');
 loadEnvironment();
+const { displayPetShopBrandName } = require('./helpers/petShopBrandName');
 const express = require('express');
 const session = require('express-session');
 const flash = require('connect-flash');
@@ -32,6 +33,7 @@ app.use(require('./middleware/csrf').csrfToken);
 app.use(flash());
 app.use((req, res, next) => {
   res.locals.currentPath = req.path;
+  res.locals.displayPetShopBrandName = displayPetShopBrandName;
   next();
 });
 app.use(require('./middleware/cartCount'));
@@ -44,10 +46,15 @@ app.use(require('./routes/adminRoutes'));
 app.use(require('./routes/appointmentRoutes'));
 app.use(require('./routes/petShopRoutes'));
 app.use(require('./routes/petRoutes'));
-app.use(require('./routes/journalRoutes'));
 app.use(require('./routes/paymentRoutes'));
 
 // =========================
 // Start Server
 // =========================
 app.listen(PORT, () => console.log(`App running on http://localhost:${PORT}`));
+
+require('./config/db').query('SELECT 1', error => {
+  if (error) {
+    console.error(`MySQL connection check failed (${error.code || 'UNKNOWN'}). Start the MySQL95 Windows service and verify DB_HOST, DB_PORT, DB_USER and DB_PASSWORD in .env; login will fail until it succeeds.`);
+  }
+});

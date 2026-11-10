@@ -12,7 +12,7 @@
     <nav class="shop-breadcrumb" aria-label="Breadcrumb">
       <a href="/shop">Pet Shop</a><span aria-hidden="true">/</span>
       <% if (product.trusted_brand_code) { %>
-        <a href="/shop/brands/<%= encodeURIComponent(product.trusted_brand_code) %>"><%= product.trusted_brand_name %></a><span aria-hidden="true">/</span>
+        <a href="/shop/brands/<%= encodeURIComponent(product.trusted_brand_code) %>"><%= displayPetShopBrandName(product.trusted_brand_name) %></a><span aria-hidden="true">/</span>
       <% } %>
       <span aria-current="page"><%= product.product_name %></span>
     </nav>
@@ -39,7 +39,7 @@
       </div>
       <section class="shop-detail-copy">
         <p class="shop-eyebrow"><%= product.category_name %></p>
-        <p class="shop-product-brand"><%= product.brand || 'Thoughtfully selected' %></p>
+        <p class="shop-product-brand"><%= displayPetShopBrandName(product.brand || 'Thoughtfully selected') %></p>
         <h1><%= product.product_name %></h1>
         <p class="shop-detail-description"><%= product.description %></p>
         <% if (session && session.user && session.user.role === 'user') { %>

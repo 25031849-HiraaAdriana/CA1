@@ -33,8 +33,8 @@
             <input name="product_name" maxlength="180" required value="<%= product.product_name || '' %>">
           </label>
           <label>Brand
-            <input name="brand" list="knownProductBrands" maxlength="120" value="<%= product.brand || '' %>" data-product-brand>
-            <datalist id="knownProductBrands"><% brandSuggestions.forEach(brandName => { %><option value="<%= brandName %>"><% }); %></datalist>
+            <input name="brand" list="knownProductBrands" maxlength="120" value="<%= displayPetShopBrandName(product.brand || '') %>" data-product-brand>
+            <datalist id="knownProductBrands"><% brandSuggestions.forEach(brandName => { %><option value="<%= brandName %>"><%= displayPetShopBrandName(brandName) %></option><% }); %></datalist>
           </label>
           <label>Internal product category
             <select id="productCategory" name="category_id" required>
@@ -74,7 +74,7 @@
             <select name="trusted_brand_name" data-trusted-brand>
               <option value="">Choose a trusted brand when applicable</option>
               <% trustedBrands.forEach(brand => { %>
-                <option value="<%= brand.brand_name %>" data-brand-group="<%= brand.storefront_group %>" <%= (product.trusted_brand_name || product.brand) === brand.brand_name ? 'selected' : '' %>><%= brand.brand_name %></option>
+                <option value="<%= brand.brand_name %>" data-brand-group="<%= brand.storefront_group %>" <%= (product.trusted_brand_name || product.brand) === brand.brand_name ? 'selected' : '' %>><%= displayPetShopBrandName(brand.brand_name) %></option>
               <% }); %>
             </select>
             <small>Only brands from the matching group are accepted for Trusted Brand placements.</small>

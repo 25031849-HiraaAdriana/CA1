@@ -51,15 +51,6 @@
             </select>
           </label>
           <label>
-            <span>Animal Species</span>
-            <select name="species">
-              <option value="">All species</option>
-              <% speciesOptions.forEach(species => { %>
-                <option value="<%= species %>" <%= filters.species === species ? 'selected' : '' %>><%= species %></option>
-              <% }); %>
-            </select>
-          </label>
-          <label>
             <span>Price Range</span>
             <select name="price_range">
               <% priceRanges.forEach(range => { %>
@@ -69,7 +60,7 @@
           </label>
           <button class="shop-button shop-button-dark" type="submit">Search</button>
         </form>
-        <p class="shop-filter-note">Age options describe whether age-in-months suitability is recorded for the selected species; they do not imply veterinary age categories.</p>
+        <p class="shop-filter-note">Age options describe whether age-in-months suitability is recorded; they do not imply veterinary age categories.</p>
         <% if (!products.length) { %>
           <p class="shop-empty" role="status"><%= typeof catalogueErrorMessage !== 'undefined' && catalogueErrorMessage
             ? 'Product details are temporarily unavailable.'
@@ -86,8 +77,23 @@
       <div class="shop-divider" role="separator"></div>
       <section class="shop-section shop-brand-section" aria-labelledby="trusted-brands-title">
         <% // Add verified, permitted local logo paths here, including their actual file extensions.
-        const brandLogoPaths = Object.create(null);
-        const storeLogoPaths = Object.create(null); %>
+        const brandLogoPaths = Object.assign(Object.create(null), {
+          purina: '/images/brands/purina.png',
+          whiskas: '/images/brands/whiskas.png',
+          'royal-canin': '/images/brands/royal-canin.png',
+          sheba: '/images/brands/sheba.png',
+          applaws: '/images/brands/applaws.png',
+          cesar: '/images/brands/cesar.png',
+          nature: '/images/brands/nature.png',
+          'bunny-nature': '/images/brands/bunny-nature.png',
+          'vita-prima': '/images/brands/sunseed.png',
+          'science-selective': '/images/brands/science-selective.png'
+        });
+        const storeLogoPaths = Object.assign(Object.create(null), {
+          catsmart: '/images/brands/catsmart.png',
+          'pet-lovers-centre': '/images/brands/pet-lovers-centre.png',
+          polypet: '/images/brands/polypet.png'
+        }); %>
         <div class="shop-section-heading">
           <div>
             <p class="shop-eyebrow">Editorial brand browsing</p>
@@ -103,16 +109,18 @@
             <h3 id="brand-group-<%= group.key %>"><%= group.title %></h3>
             <div class="shop-brand-grid">
               <% trustedBrands.filter(brand => brand.storefront_group === group.key).forEach(brand => { %>
-                <a class="shop-brand-logo-link" href="/shop/brands/<%= encodeURIComponent(brand.brand_code) %>" aria-label="<%= brand.brand_name %> products">
+                <% const brandLabel = displayPetShopBrandName(brand.brand_name); %>
+                <a class="shop-brand-logo-link" href="/shop/brands/<%= encodeURIComponent(brand.brand_code) %>" aria-label="<%= brandLabel %> products">
                   <% if (brandLogoPaths[brand.brand_code]) { %>
-                    <img src="<%= brandLogoPaths[brand.brand_code] %>" alt="" loading="lazy" data-logo-image hidden>
+                    <img src="<%= brandLogoPaths[brand.brand_code] %>" alt="<%= brandLabel %> logo" data-logo-image hidden>
                   <% } %>
-                  <span class="shop-logo-fallback" data-logo-fallback><%= brand.brand_name %></span>
+                  <span class="shop-logo-fallback" data-logo-fallback><%= brandLabel %></span>
                 </a>
               <% }); %>
             </div>
           </section>
         <% }); %>
+        <p class="shop-editorial-disclaimer">Brand listings are for editorial browsing only and do not imply an authorised distribution or commercial partnership.</p>
       </section>
 
       <div class="shop-divider" role="separator"></div>
@@ -131,7 +139,7 @@
           ].forEach(store => { %>
             <a class="shop-store-logo-link" href="<%= store.url %>" target="_blank" rel="noopener noreferrer" aria-label="Visit <%= store.name %> official website (opens in a new tab)">
                 <% if (storeLogoPaths[store.slug]) { %>
-                  <img src="<%= storeLogoPaths[store.slug] %>" alt="" loading="lazy" data-logo-image hidden>
+                  <img src="<%= storeLogoPaths[store.slug] %>" alt="<%= store.name %> logo" data-logo-image hidden>
                 <% } %>
                 <span class="shop-logo-fallback" data-logo-fallback><%= store.name %></span>
               </a>

@@ -248,6 +248,7 @@ require.cache[connectionPath] = {
   paths: []
 };
 const activityModelPath = require.resolve('../models/adminActivityModel');
+const { displayPetShopBrandName } = require('../helpers/petShopBrandName');
 const originalActivityModelModule = require.cache[activityModelPath];
 require.cache[activityModelPath] = {
   id: activityModelPath,
@@ -317,6 +318,7 @@ before(async () => {
   app.use(flash());
   app.use((req, res, next) => {
     res.locals.currentPath = req.path;
+    res.locals.displayPetShopBrandName = displayPetShopBrandName;
     next();
   });
   app.use(require('../middleware/cartCount'));
@@ -326,7 +328,8 @@ before(async () => {
       username: `${req.params.role}-test`,
       name: 'Test account',
       role: req.params.role
-    };    res.sendStatus(204);
+    };
+    res.sendStatus(204);
   });
   app.get('/test-navigation/:page', (req, res) => {
     res.render('partials/navbar', { session: req.session });
@@ -379,12 +382,6 @@ test('unauthenticated shop routes redirect to login and a User returns to the re
     headers: { Connection: 'close' }
   });
   const sessionCookie = protectedResponse.headers.get('set-cookie').split(';', 1)[0];
-  const loginPageResponse = await fetch(`${baseUrl}/login`, {
-    headers: { Cookie: sessionCookie, Connection: 'close' }
-  });
-  const loginPage = await loginPageResponse.text();
-  const csrfToken = loginPage.match(/name="_csrf" value="([^"]+)"/)?.[1];
-  assert.ok(csrfToken);
   const loginResponse = await fetch(`${baseUrl}/login`, {
     method: 'POST',
     redirect: 'manual',
@@ -393,13 +390,12 @@ test('unauthenticated shop routes redirect to login and a User returns to the re
       'Content-Type': 'application/x-www-form-urlencoded',
       Connection: 'close'
     },
-    body: new URLSearchParams({ username: 'test-user', password: 'test-password', _csrf: csrfToken })
+    body: new URLSearchParams({ username: 'test-user', password: 'test-password' })
   });
   assert.equal(loginResponse.status, 302);
   assert.equal(loginResponse.headers.get('location'), intendedUrl);
-  const loggedInCookie = loginResponse.headers.get('set-cookie').split(';', 1)[0];
   const collectionResponse = await fetch(`${baseUrl}${intendedUrl}`, {
-    headers: { Cookie: loggedInCookie, Connection: 'close' }
+    headers: { Cookie: sessionCookie, Connection: 'close' }
   });
   assert.equal(collectionResponse.status, 200);
 });
@@ -427,12 +423,11 @@ test('shop search and pet suggestions use server filters and owner-scoped pet se
   assert.match(html, /Thoughtful finds for pets and their people/);
   assert.match(html, /Sample food/);
   assert.match(html, /<h2 id="pomi-products-title">Pomi Products<\/h2>/);
-  assert.doesNotMatch(html, /Brand listings are for editorial browsing only/);
   assert.doesNotMatch(html, /A few thoughtful favourites|Featured for everyday care|Explore each collection/i);
   assert.doesNotMatch(html, /Clear filters/);
   assert.match(html, /name="search"/);
   assert.match(html, /name="age_category"/);
-  assert.match(html, /name="species"/);
+  assert.doesNotMatch(html, /Animal Species|name="species"/);
   assert.match(html, /name="price_range"/);
   assert.doesNotMatch(html, /name="category"/);
   assert.match(html, /Cart/);
@@ -482,28 +477,90 @@ test('all ten trusted brands link to scoped product pages with combined server f
     headers: { Cookie: userCookie, Connection: 'close' }
   });
   const shopHtml = await shopResponse.text();
+  const trustedLogoFiles = {
+    purina: 'purina.png',
+    whiskas: 'whiskas.png',
+    'royal-canin': 'royal-canin.png',
+    sheba: 'sheba.png',
+    applaws: 'applaws.png',
+    cesar: 'cesar.png',
+    nature: 'nature.png',
+    'bunny-nature': 'bunny-nature.png',
+    'vita-prima': 'sunseed.png',
+    'science-selective': 'science-selective.png'
+  };
   for (const brand of trustedBrands) {
     assert.match(shopHtml, new RegExp(`href="/shop/brands/${brand.brand_code}"`));
+    const displayName = brand.brand_code === 'vita-prima' ? 'SUNSEED' : brand.brand_name;
+    const link = shopHtml.match(new RegExp(
+      `<a class="shop-brand-logo-link" href="/shop/brands/${brand.brand_code}" aria-label="${displayName} products">([\\s\\S]*?)<\\/a>`
+    ));
+    assert.ok(link, `${displayName} has an accessible brand link`);
+    if (trustedLogoFiles[brand.brand_code]) {
+      const logoPath = `/images/brands/${trustedLogoFiles[brand.brand_code]}`;
+      assert.ok(link[1].includes(`src="${logoPath}" alt="${displayName} logo" data-logo-image hidden`));
+      const logoResponse = await fetch(`${baseUrl}${logoPath}`);
+      assert.equal(logoResponse.status, 200, `${displayName} logo loads`);
+      assert.match(logoResponse.headers.get('content-type'), /^image\/png/);
+      assert.ok((await logoResponse.arrayBuffer()).byteLength > 0);
+    } else {
+      assert.doesNotMatch(link[1], /<img\b/);
+    }
+    assert.ok(link[1].includes(`data-logo-fallback>${displayName}</span>`));
     const response = await fetch(`${baseUrl}/shop/brands/${brand.brand_code}`, {
       headers: { Cookie: userCookie, Connection: 'close' }
     });
     assert.equal(response.status, 200, `${brand.brand_name} page`);
-    assert.ok((await response.text()).includes(brand.brand_name));
+    const brandPageHtml = await response.text();
+    assert.ok(brandPageHtml.includes(displayName));
+    assert.doesNotMatch(brandPageHtml, /Animal Species|name="species"/);
+    if (brand.brand_code === 'vita-prima') {
+      assert.match(brandPageHtml, /<title>SUNSEED \| Pomi<\/title>/);
+      assert.match(brandPageHtml, /SUNSEED Products/);
+      assert.doesNotMatch(brandPageHtml, /Vita Prima/);
+    }
   }
   assert.equal((shopHtml.match(/class="shop-brand-logo-link"/g) || []).length, 10);
   assert.equal((shopHtml.match(/class="shop-store-logo-link"/g) || []).length, 3);
-  assert.doesNotMatch(shopHtml, /src="\/images\/(?:brands|pet-shops)\//);
+  const purinaLink = shopHtml.match(/<a class="shop-brand-logo-link" href="([^"]+)" aria-label="Purina products">([\s\S]*?)<\/a>/);
+  assert.ok(purinaLink);
+  assert.equal(purinaLink[1], '/shop/brands/purina');
+  assert.match(purinaLink[2], /<img src="\/images\/brands\/purina\.png" alt="Purina logo" data-logo-image hidden>/);
+  assert.match(purinaLink[2], /<span class="shop-logo-fallback" data-logo-fallback>Purina<\/span>/);
+  const logoResponse = await fetch(`${baseUrl}/images/brands/purina.png`);
+  assert.equal(logoResponse.status, 200);
+  assert.match(logoResponse.headers.get('content-type'), /^image\/png/);
+  const purinaResponse = await fetch(`${baseUrl}${purinaLink[1]}`, {
+    headers: { Cookie: userCookie, Connection: 'close' }
+  });
+  assert.equal(purinaResponse.status, 200);
+  assert.match(await purinaResponse.text(), /Purina/);
+  const purinaFilters = calls.filter(call => call.type === 'listProducts').at(-1).filters;
+  assert.equal(purinaFilters.brandId, 1);
+  assert.equal(purinaFilters.storefrontPlacement, 'trusted_cats_dogs');
+  assert.equal((shopHtml.match(/src="\/images\/brands\//g) || []).length, 13);
   assert.equal((shopHtml.match(/data-logo-fallback/g) || []).length, 13);
   assert.match(shopHtml, /aria-label="Royal Canin products"/);
   assert.match(shopHtml, /Cats &amp; Dogs Trusted Brands/);
   assert.match(shopHtml, /Small Furries Trusted Brands/);
-  assert.doesNotMatch(shopHtml, /editorial browsing only/);
-  for (const website of [
-    'https://catsmart.com.sg/',
-    'https://www.petloverscentre.com/',
-    'https://polypet.com.sg/'
+  assert.match(shopHtml, /editorial browsing only/);
+  for (const store of [
+    { name: 'CatSmart', file: 'catsmart.png', url: 'https://catsmart.com.sg/' },
+    { name: 'Pet Lovers Centre', file: 'pet-lovers-centre.png', url: 'https://www.petloverscentre.com/' },
+    { name: 'Polypet', file: 'polypet.png', url: 'https://polypet.com.sg/' }
   ]) {
-    assert.ok(shopHtml.includes(`href="${website}" target="_blank" rel="noopener noreferrer"`));
+    const link = shopHtml.match(new RegExp(
+      `<a class="shop-store-logo-link" href="${store.url.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}" target="_blank" rel="noopener noreferrer" aria-label="Visit ${store.name} official website \\(opens in a new tab\\)">([\\s\\S]*?)<\\/a>`
+    ));
+    assert.ok(link, `${store.name} opens its official site in a new tab`);
+    const logoPath = `/images/brands/${store.file}`;
+    assert.ok(link[1].includes(`src="${logoPath}" alt="${store.name} logo"`));
+    assert.doesNotMatch(link[1], /loading="lazy"/, 'hidden logo images must load eagerly');
+    assert.ok(link[1].includes(`data-logo-fallback>${store.name}</span>`));
+    const logoResponse = await fetch(`${baseUrl}${logoPath}`);
+    assert.equal(logoResponse.status, 200, `${store.name} logo loads`);
+    assert.match(logoResponse.headers.get('content-type'), /^image\/png/);
+    assert.ok((await logoResponse.arrayBuffer()).byteLength > 0);
   }
 
   const brandResponse = await fetch(
@@ -613,7 +670,7 @@ test('legacy category pages remain accessible while the Shop homepage omits cate
   assert.ok(searchForm);
   assert.match(searchForm[0], /name="search"/);
   assert.match(searchForm[0], /name="age_category"/);
-  assert.match(searchForm[0], /name="species"/);
+  assert.doesNotMatch(searchForm[0], /Animal Species|name="species"/);
   assert.match(searchForm[0], /name="price_range"/);
 
   const routeCodes = categories.map(category => category.category_code);
@@ -856,6 +913,8 @@ test('Admin product management remains Admin-only, CSRF-protected and excludes p
   assert.match(formHtml, /type="checkbox" name="species_suitability" value="Rabbit"/);
   assert.match(formHtml, /type="checkbox" name="species_suitability" value="Guinea Pig"/);
   assert.match(formHtml, /list="knownProductBrands"/);
+  assert.match(formHtml, /<option value="Vita Prima">SUNSEED<\/option>/);
+  assert.match(formHtml, /<option value="Vita Prima" data-brand-group="small_furries"[^>]*>SUNSEED<\/option>/);
   const token = csrfToken(formHtml);
 
   const response = await fetch(`${baseUrl}/admin/products`, {

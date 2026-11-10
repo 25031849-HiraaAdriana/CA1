@@ -4,7 +4,7 @@ const dotenv = require('dotenv');
 const environmentFile = path.join(__dirname, '..', '.env');
 
 function loadEnvironment() {
-  dotenv.config({ path: environmentFile, quiet: true });
+  dotenv.config({ path: environmentFile, override: true, quiet: true });
 }
 
 function requireSessionSecret(environment = process.env) {

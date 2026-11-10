@@ -99,6 +99,35 @@ test('User and Admin navigation omit retired prescription modules and retain act
       assert.match(html, /<\/ul>\s*<\/div>\s*<a class="portal-cart/);
     }
     assert.doesNotMatch(html, /\/prescriptions|prescription-requests|prescription-medications|Medication availability/i);
+    assert.doesNotMatch(html, /\/journals|pet care journal/i);
+  }
+});
+
+test('retired journal endpoints are unavailable to visitors and signed-in users', async () => {
+  const applicationSource = fs.readFileSync(path.join(__dirname, '..', 'app.js'), 'utf8');
+  assert.doesNotMatch(applicationSource, /journalRoutes/);
+
+  const loginResponse = await fetch(`${baseUrl}/test-login/user`);
+  const userCookie = loginResponse.headers.get('set-cookie').split(';', 1)[0];
+  const routes = [
+    ['GET', '/journals'],
+    ['GET', '/journals/search?q=walk'],
+    ['GET', '/journals/new'],
+    ['POST', '/journals/new'],
+    ['GET', '/journals/edit/1'],
+    ['POST', '/journals/edit/1'],
+    ['GET', '/journals/delete/1']
+  ];
+
+  for (const cookie of [undefined, userCookie]) {
+    for (const [method, route] of routes) {
+      const response = await fetch(`${baseUrl}${route}`, {
+        method,
+        headers: cookie ? { Cookie: cookie } : {},
+        redirect: 'manual'
+      });
+      assert.equal(response.status, 404, `${method} ${route} should be retired`);
+    }
   }
 });
 

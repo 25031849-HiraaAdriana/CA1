@@ -116,6 +116,10 @@ test('owner to admin refill flow, validation, rejection, acceptance, cart and re
   const admin = await login('admin', 1);
   const detail = '/pets/1/medical-records/31';
   const submit = `${detail}/refill-requests/11/new`;
+  const emptyAdminPage = await get('/admin/refill-requests', admin);
+  assert.equal(emptyAdminPage.response.status, 200);
+  assert.match(emptyAdminPage.html, /No refill requests have been submitted/);
+  assert.equal((await get('/admin/refill-requests', other)).response.status, 403);
   let page = await get(detail, owner);
   assert.equal(page.response.status, 200);
   assert.match(page.html, /DEMO quantity unit/);

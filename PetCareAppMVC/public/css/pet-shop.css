@@ -2144,7 +2144,7 @@ body:not(.shop-page) .container .table thead th {
 }
 
 .shop-storefront-filters {
-  grid-template-columns: minmax(190px, 1.5fr) repeat(3, minmax(145px, 1fr)) auto;
+  grid-template-columns: minmax(190px, 1.5fr) repeat(2, minmax(145px, 1fr)) auto;
   gap: 10px;
   margin-bottom: 7px;
   padding: 13px;
@@ -2811,8 +2811,22 @@ body:not(.shop-page) .container .table thead th {
 }
 
 .shop-brand-grid {
-  grid-template-columns: repeat(6, minmax(0, 1fr));
-  gap: 15px 26px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 15px clamp(16px, 2.4vw, 36px);
+}
+
+.shop-brand-logo-link {
+  flex: 1 1 150px;
+  max-width: 180px;
+}
+
+.shop-alternative-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 20px clamp(16px, 3vw, 36px);
 }
 
 .shop-brand-logo-link,
@@ -2863,12 +2877,12 @@ body:not(.shop-page) .container .table thead th {
 }
 
 .shop-alternative-grid {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 36px;
   align-items: center;
 }
 
 .shop-store-logo-link {
+  flex: 1 1 185px;
+  max-width: 230px;
   min-height: 94px;
 }
 
@@ -2928,16 +2942,19 @@ body:not(.shop-page) .container .table thead th {
   }
 
   .shop-brand-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 8px 15px;
+    gap: 8px 10px;
+  }
+
+  .shop-brand-logo-link {
+    flex-basis: calc(50% - 10px);
   }
 
   .shop-alternative-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 10px;
   }
 
   .shop-store-logo-link {
+    flex-basis: 100%;
     min-height: 75px;
   }
 
