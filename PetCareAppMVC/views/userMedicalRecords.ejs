@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#102A43">
+  <title><%= pet.name %>'s Medical Records | Pomi</title>
+  <link href="/css/user-medical-records.css" rel="stylesheet">
+</head>
+<body class="medical-page">
+  <%- include('partials/navbar') %>
+  <main class="medical-shell">
+    <a class="medical-back-link" href="/dashboard#digital-health-passport">← Back to Digital Health Passports</a>
+    <header class="medical-page-heading">
+      <p class="medical-eyebrow">Digital Health Passport</p>
+      <h1><%= pet.name %>'s medical records</h1>
+      <p>Published records reviewed by Pomi administrators. Draft records are not shown.</p>
+      <dl class="medical-pet-summary">
+        <div><dt>Pet</dt><dd><%= pet.name %></dd></div>
+        <div><dt>Species &amp; breed</dt><dd><%= pet.species %><% if (pet.breed) { %> · <%= pet.breed %><% } %></dd></div>
+        <div><dt>AVS licence number</dt><dd><%= pet.avs_licence_number || 'Not on file' %></dd></div>
+        <div><dt>Microchip ID</dt><dd><%= pet.microchip_id || 'Not on file' %></dd></div>
+      </dl>
+    </header>
+
+    <section class="medical-categories" aria-labelledby="categories-title">
+      <div class="medical-section-heading">
+        <div>
+          <p class="medical-eyebrow">Browse by type</p>
+          <h2 id="categories-title">Medical record categories</h2>
+        </div>
+      </div>
+      <nav class="category-grid" aria-label="Medical record categories">
+        <% categories.forEach(category => { %>
+          <a
+            class="category-card<%= category.category_code === selectedCategory.category_code ? ' category-card-selected' : '' %>"
+            href="/pets/<%= encodeURIComponent(pet.id) %>/medical-records?category=<%= encodeURIComponent(category.category_code) %>"
+            <% if (category.category_code === selectedCategory.category_code) { %>aria-current="page"<% } %>
+          >
+            <span class="category-card-name"><%= category.category_name %></span>
+            <span class="category-card-count"><%= category.recordCount %> <%= category.recordCount === 1 ? 'record' : 'records' %></span>
+          </a>
+        <% }); %>
+      </nav>
+    </section>
+
+    <section class="medical-record-list" aria-labelledby="selected-category-title">
+      <header class="medical-section-heading">
+        <div>
+          <p class="medical-eyebrow">Published records</p>
+          <h2 id="selected-category-title"><%= selectedCategory.category_name %></h2>
+        </div>
+        <span class="medical-record-total"><%= records.length %> <%= records.length === 1 ? 'record' : 'records' %></span>
+      </header>
+
+      <% if (selectedCategory.category_code === 'medication_history') { %>
+        <div class="medication-demo-notice" role="note">
+          School demonstration only. Open a record to see its Admin-reviewed medication details. This is not veterinary authorisation, a prescription, or a medication-supply service.
+        </div>
+        <p><a class="medical-button medical-button-secondary" href="/pets/<%= encodeURIComponent(pet.id) %>/medical-records/refill-requests">My Refill Requests</a></p>
+      <% } %>
+
+      <% if (records.length > 0) { %>
+        <div class="record-card-list">
+          <% records.forEach(record => { %>
+            <article class="record-card">
+              <div class="record-card-heading">
+                <div>
+                  <h3><%= record.title %></h3>
+                  <p class="record-source"><%= record.source_name %></p>
+                </div>
+                <% if (record.displayRecordDate) { %>
+                  <time class="record-date" datetime="<%= record.displayRecordDate %>"><%= record.displayRecordDate %></time>
+                <% } %>
+              </div>
+              <% if (record.description) { %>
+                <p class="record-description"><%= record.description %></p>
+              <% } %>
+              <div class="record-card-footer">
+                <span class="record-category-label"><%= record.category_name %></span>
+                <a class="medical-button medical-button-secondary" href="/pets/<%= encodeURIComponent(pet.id) %>/medical-records/<%= encodeURIComponent(record.id) %>">
+                  View Medical Record <span aria-hidden="true">→</span>
+                </a>
+              </div>
+            </article>
+          <% }); %>
+        </div>
+      <% } else { %>
+        <div class="medical-empty-state">
+          <p class="medical-eyebrow">No published records</p>
+          <h3>No medical records are available in this category yet.</h3>
+          <p>Published records for <%= pet.name %> will appear here after they have been reviewed.</p>
+        </div>
+      <% } %>
+    </section>
+  </main>
+</body>
+</html>

@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#102A43">
+  <meta name="description" content="Emergency veterinary services and regular veterinary clinics across Singapore.">
+  <title>Veterinary Care &amp; Emergency Contacts | Pomi</title>
+  <link href="/css/pethub-dashboard.css" rel="stylesheet">
+  <link href="/css/veterinary-directory.css" rel="stylesheet">
+</head>
+<body class="veterinary-directory-page">
+  <%- include('partials/navbar') %>
+  <main class="veterinary-directory-shell">
+    <a class="veterinary-back-link" href="/dashboard">← Back to dashboard</a>
+    <header class="veterinary-page-heading">
+      <p class="veterinary-eyebrow">Pomi · Veterinary care</p>
+      <h1>Veterinary Care &amp; Emergency Contacts</h1>
+      <p>Find 24-hour emergency veterinary services and regular veterinary clinics across Singapore.</p>
+      <aside class="veterinary-before-visit" aria-labelledby="veterinary-before-visit-title">
+        <h2 id="veterinary-before-visit-title">Before You Visit</h2>
+        <p>Clinic operating hours, availability, and services may change. Please contact the clinic directly to confirm that it can accommodate your pet's needs. Pomi provides these listings for informational purposes only and is not affiliated with the listed veterinary clinics.</p>
+      </aside>
+    </header>
+
+    <section class="veterinary-filters" aria-label="Filter veterinary clinics">
+      <fieldset>
+        <legend>Service type</legend>
+        <div class="veterinary-filter-row" role="group" aria-label="Filter by service">
+          <button type="button" class="veterinary-filter is-selected" data-service-filter="all" aria-pressed="true">All services</button>
+          <button type="button" class="veterinary-filter" data-service-filter="emergency" aria-pressed="false">24-hour emergency</button>
+          <button type="button" class="veterinary-filter" data-service-filter="regular" aria-pressed="false">Regular clinics</button>
+        </div>
+      </fieldset>
+      <fieldset>
+        <legend>Region</legend>
+        <div class="veterinary-filter-row" role="group" aria-label="Filter by region">
+          <button type="button" class="veterinary-filter is-selected" data-region-filter="all" aria-pressed="true">All regions</button>
+          <% regions.forEach(region => { %>
+            <button type="button" class="veterinary-filter" data-region-filter="<%= region %>" aria-pressed="false"><%= region %></button>
+          <% }); %>
+        </div>
+      </fieldset>
+    </section>
+
+    <section class="veterinary-category-section" data-clinic-category-section="emergency" aria-labelledby="emergency-directory-title">
+      <header class="veterinary-section-heading">
+        <div>
+          <p class="veterinary-eyebrow veterinary-eyebrow-emergency">Section A · Emergency</p>
+          <h2 id="emergency-directory-title">24-Hour Emergency Veterinary Services</h2>
+        </div>
+        <span class="veterinary-availability-label">Emergency service · Call to confirm before travelling</span>
+      </header>
+      <div class="veterinary-clinic-grid">
+        <% clinics.filter(clinic => clinic.category === 'emergency').forEach(clinic => { %>
+          <article class="veterinary-clinic-card veterinary-clinic-emergency" data-clinic-card data-category="emergency" data-region="<%= clinic.region %>">
+            <div class="veterinary-clinic-heading">
+              <span class="veterinary-region-tag"><%= clinic.region %></span>
+              <span class="veterinary-emergency-tag">24-hour emergency</span>
+            </div>
+            <h3><%= clinic.name %></h3>
+            <p class="veterinary-address"><%= clinic.address || 'Address unavailable' %></p>
+            <% if (!clinic.phone) { %>
+              <p class="veterinary-phone-unverified">Phone unavailable</p>
+            <% } else if (clinic.phoneVerified === false) { %>
+              <p class="veterinary-phone-unverified">Phone not confirmed on official site: <%= clinic.phone %></p>
+            <% } else { %>
+              <p class="veterinary-phone"><a href="tel:<%= clinic.telephoneLink %>"><%= clinic.phone %></a></p>
+            <% } %>
+            <p class="veterinary-clinic-hours"><%= clinic.availabilityDetails %></p>
+            <% if (clinic.verificationNote) { %>
+              <p class="veterinary-verification-note" role="note"><%= clinic.verificationNote %></p>
+            <% } %>
+            <div class="veterinary-card-actions">
+              <% if (!clinic.address || clinic.addressVerified === false) { %>
+                <span class="veterinary-action-unavailable" aria-disabled="true">Get Directions unavailable</span>
+              <% } else { %>
+                <a class="veterinary-directions-link" href="<%= clinic.directionsUrl %>" target="_blank" rel="noopener noreferrer">Get Directions</a>
+              <% } %>
+              <% if (clinic.website) { %>
+                <a class="veterinary-source-link" href="<%= clinic.website %>" target="_blank" rel="noopener noreferrer">Official Website</a>
+              <% } else { %>
+                <span class="veterinary-action-unavailable" aria-disabled="true">Website unavailable</span>
+              <% } %>
+            </div>
+            <p class="veterinary-verified-date">Official source checked <time datetime="<%= clinic.verifiedOn %>"><%= clinic.verifiedOn %></time></p>
+          </article>
+        <% }); %>
+      </div>
+    </section>
+
+    <section class="veterinary-category-section" data-clinic-category-section="regular" aria-labelledby="regular-directory-title">
+      <header class="veterinary-section-heading">
+        <div>
+          <p class="veterinary-eyebrow">Section B · Regular hours</p>
+          <h2 id="regular-directory-title">Regular Veterinary Clinics</h2>
+        </div>
+        <span class="veterinary-availability-label">Regular-hours clinics · Not emergency services</span>
+      </header>
+      <div class="veterinary-clinic-grid">
+        <% clinics.filter(clinic => clinic.category === 'regular').forEach(clinic => { %>
+          <article class="veterinary-clinic-card" data-clinic-card data-category="regular" data-region="<%= clinic.region %>">
+            <div class="veterinary-clinic-heading">
+              <span class="veterinary-region-tag"><%= clinic.region %></span>
+              <span class="veterinary-regular-tag">Regular clinic</span>
+            </div>
+            <h3><%= clinic.name %></h3>
+            <p class="veterinary-address"><%= clinic.address || 'Address unavailable' %></p>
+            <% if (!clinic.phone) { %>
+              <p class="veterinary-phone-unverified">Phone unavailable</p>
+            <% } else if (clinic.phoneVerified === false) { %>
+              <p class="veterinary-phone-unverified">Phone not confirmed on official site: <%= clinic.phone %></p>
+            <% } else { %>
+              <p class="veterinary-phone"><a href="tel:<%= clinic.telephoneLink %>"><%= clinic.phone %></a></p>
+            <% } %>
+            <p class="veterinary-clinic-hours"><%= clinic.availabilityDetails %></p>
+            <% if (clinic.verificationNote) { %>
+              <p class="veterinary-verification-note" role="note"><%= clinic.verificationNote %></p>
+            <% } %>
+            <div class="veterinary-card-actions">
+              <% if (!clinic.address || clinic.addressVerified === false) { %>
+                <span class="veterinary-action-unavailable" aria-disabled="true">Get Directions unavailable</span>
+              <% } else { %>
+                <a class="veterinary-directions-link" href="<%= clinic.directionsUrl %>" target="_blank" rel="noopener noreferrer">Get Directions</a>
+              <% } %>
+              <% if (clinic.website) { %>
+                <a class="veterinary-source-link" href="<%= clinic.website %>" target="_blank" rel="noopener noreferrer">Official Website</a>
+              <% } else { %>
+                <span class="veterinary-action-unavailable" aria-disabled="true">Website unavailable</span>
+              <% } %>
+            </div>
+            <p class="veterinary-verified-date">Official source checked <time datetime="<%= clinic.verifiedOn %>"><%= clinic.verifiedOn %></time></p>
+          </article>
+        <% }); %>
+      </div>
+    </section>
+
+  </main>
+  <script src="/js/veterinary-directory.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,47 @@
+<article class="shop-product-card">
+  <a class="shop-product-image" href="/shop/products/<%= product.id %>">
+    <% if (product.image_path) { %>
+      <img src="<%= product.image_path %>" alt="<%= product.product_name %>" loading="lazy">
+    <% } else { %>
+      <span class="shop-image-unavailable">Product photo not supplied</span>
+    <% } %>
+  </a>
+  <% if (session && session.user && session.user.role === 'user') { %>
+    <form class="shop-favourite-form" method="post" action="/shop/favourites/<%= product.id %>">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+      <input type="hidden" name="return_to" value="<%= returnTo %>">
+      <input type="hidden" name="action" value="<%= Number(product.is_favourite) === 1 ? 'remove' : 'add' %>">
+      <button class="shop-favourite-button <%= Number(product.is_favourite) === 1 ? 'is-favourite' : '' %>" type="submit"
+        aria-label="<%= Number(product.is_favourite) === 1 ? 'Remove from favourites' : 'Add to favourites' %>">
+        <span aria-hidden="true"><%= Number(product.is_favourite) === 1 ? '♥' : '♡' %></span>
+      </button>
+    </form>
+  <% } %>
+  <div class="shop-product-copy">
+    <% if (product.brand) { %><p class="shop-product-brand"><%= product.brand %></p><% } %>
+    <h3><a href="/shop/products/<%= product.id %>"><%= product.product_name %></a></h3>
+    <p class="shop-product-description"><%= product.description %></p>
+    <p class="shop-product-suitability"><%= Array.isArray(product.species_suitability) ? product.species_suitability.join(', ') : '' %>
+      <% if (product.minimum_age_months !== null || product.maximum_age_months !== null) { %>
+        <span> · <%= product.minimum_age_months === null ? 'Any age' : `${product.minimum_age_months} mo` %>–<%= product.maximum_age_months === null ? 'Any age' : `${product.maximum_age_months} mo` %></span>
+      <% } %>
+    </p>
+    <div class="shop-product-bottom">
+      <strong>S$<%= Number(product.price_sgd).toFixed(2) %></strong>
+      <% if (Number(product.stock_quantity) > 0) { %>
+        <span class="shop-stock">In stock</span>
+      <% } else { %>
+        <span class="shop-stock shop-stock-out">Out of stock</span>
+      <% } %>
+    </div>
+    <% if (session && session.user && session.user.role === 'user' && Number(product.stock_quantity) > 0) { %>
+      <form class="shop-quick-add" method="post" action="/cart/items/<%= product.id %>">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+        <input type="hidden" name="quantity" value="1">
+        <button class="shop-button shop-button-outline" type="submit">Add to Cart</button>
+      </form>
+    <% } else { %>
+      <a class="shop-text-link" href="/shop/products/<%= product.id %>">View product <span aria-hidden="true">↗</span></a>
+    <% } %>
+  </div>
+</article>

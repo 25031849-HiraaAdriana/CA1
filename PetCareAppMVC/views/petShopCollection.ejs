@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="<%= collection ? collection.description : 'Browse a Pomi collection.' %>">
+  <title><%= collection ? collection.category_name : 'Collection' %> | Pomi</title>
+  <script src="/js/pet-shop.js" defer></script>
+</head>
+<body class="shop-page shop-collection-page">
+  <%- include('partials/navbar') %>
+  <main>
+    <% if (errorMessage) { %><p class="shop-notice shop-notice-error" role="alert"><%= errorMessage %></p><% } %>
+    <% if (typeof catalogueErrorMessage !== 'undefined' && catalogueErrorMessage) { %><p class="shop-notice shop-notice-error" role="alert"><%= catalogueErrorMessage %></p><% } %>
+    <% if (successMessage) { %><p class="shop-notice" role="status"><%= successMessage %></p><% } %>
+    <% if (!migrationReady) { %>
+      <section class="shop-migration" aria-labelledby="collection-migration-title">
+        <p class="shop-eyebrow">Pomi · A considered collection</p>
+        <h1 id="collection-migration-title">This collection is getting ready.</h1>
+        <p>The Pet Shop catalogue and cart are unavailable until an administrator reviews and applies <code>migrations/004_add_pet_shop.sql</code>.</p>
+      </section>
+    <% } else if (collection) { %>
+      <section class="shop-collection-intro">
+        <nav class="shop-breadcrumbs" aria-label="Breadcrumb">
+          <a href="/shop">Pet Shop</a><span aria-hidden="true">/</span><span aria-current="page"><%= collection.category_name %></span>
+        </nav>
+        <div class="shop-collection-heading shop-reveal">
+          <div class="shop-collection-copy">
+            <p class="shop-eyebrow">The Pomi collection</p>
+            <h1><%= collection.category_name %></h1>
+            <p><%= collection.description %></p>
+            <a class="shop-button shop-button-dark" href="#collection-products">Explore this collection <span aria-hidden="true">↓</span></a>
+          </div>
+          <div class="shop-collection-banner">
+            <img src="<%= collection.imageUrl %>" alt="<%= collection.category_name %> collection" fetchpriority="high">
+            <span class="shop-photo-note"><%= collection.product_count %> eligible listing(s)</span>
+          </div>
+        </div>
+      </section>
+
+      <nav class="shop-collection-switcher" aria-label="Browse collections">
+        <span class="shop-collection-switcher-label">Browse collections</span>
+        <% categories.forEach(categoryOption => { %>
+          <a
+            class="shop-button <%= categoryOption.category_code === collection.category_code ? 'shop-button-dark' : 'shop-button-quiet' %>"
+            href="/shop/collections/<%= encodeURIComponent(categoryOption.category_code) %>"
+            <%= categoryOption.category_code === collection.category_code ? 'aria-current="page"' : '' %>
+          ><%= categoryOption.category_name %></a>
+        <% }); %>
+      </nav>
+
+      <section class="shop-section shop-collection-products" id="collection-products">
+        <div class="shop-section-heading shop-reveal">
+          <div>
+            <p class="shop-eyebrow"><%= selectedPet ? `A starting point for ${selectedPet.name}` : 'Considered essentials' %></p>
+            <h2>Explore the collection</h2>
+          </div>
+          <p><%= products.length %> matching product(s)</p>
+        </div>
+        <form class="shop-filters shop-reveal" method="get" action="/shop/collections/<%= encodeURIComponent(collection.category_code) %>">
+          <label>
+            <span>Search products or brands</span>
+            <input type="search" name="search" value="<%= filters.search || '' %>" placeholder="Try a product or brand">
+          </label>
+          <label>
+            <span>Animal species</span>
+            <input type="text" name="species" value="<%= selectedPet ? selectedPet.species : (filters.species || '') %>" <%= selectedPet ? 'readonly' : '' %> placeholder="e.g. Cat">
+          </label>
+          <label>
+            <span>Maximum price (SGD)</span>
+            <input type="number" name="max_price" min="0" max="99999999.99" step="0.01" value="<%= filters.maxPrice || '' %>">
+          </label>
+          <% if (pets.length) { %>
+            <label>
+              <span>Optional pet suggestions</span>
+              <select name="pet_id">
+                <option value="">Shop without choosing a pet</option>
+                <% pets.forEach(pet => { %>
+                  <option value="<%= pet.id %>" <%= selectedPet && selectedPet.id === pet.id ? 'selected' : '' %>><%= pet.name %> · <%= pet.species %></option>
+                <% }); %>
+              </select>
+            </label>
+          <% } %>
+          <label class="shop-check">
+            <input type="checkbox" name="availability" value="available" <%= filters.availableOnly ? 'checked' : '' %>>
+            <span>In stock</span>
+          </label>
+          <div class="shop-filter-actions">
+            <a class="shop-button shop-button-quiet" href="/shop/collections/<%= encodeURIComponent(collection.category_code) %>">Clear filters</a>
+            <button class="shop-button shop-button-dark" type="submit">Search</button>
+          </div>
+        </form>
+
+        <% if (selectedPet) { %>
+          <p class="shop-disclaimer">These are informational suggestions based on stored species and age details only; they do not guarantee medical suitability.</p>
+        <% } %>
+
+        <% if (!products.length) { %>
+          <div class="shop-empty shop-collection-empty shop-reveal">
+            <p class="shop-eyebrow"><%= filters.search || filters.species || filters.maxPrice || filters.availableOnly || selectedPet ? 'No matching essentials' : 'A collection in the making' %></p>
+            <h2><%= filters.search || filters.species || filters.maxPrice || filters.availableOnly || selectedPet ? 'Nothing matches these filters just yet.' : 'No eligible products are listed here yet.' %></h2>
+            <p><%= filters.search || filters.species || filters.maxPrice || filters.availableOnly || selectedPet
+              ? 'Try adjusting your filters to see more of this collection.'
+              : 'Please check back soon as this collection is curated.' %></p>
+            <% if (filters.search || filters.species || filters.maxPrice || filters.availableOnly || selectedPet) { %>
+              <a class="shop-text-link" href="/shop/collections/<%= encodeURIComponent(collection.category_code) %>">Clear filters <span aria-hidden="true">↗</span></a>
+            <% } %>
+          </div>
+        <% } else { %>
+          <div class="shop-product-grid">
+            <% products.forEach(product => { %>
+              <%- include('partials/shopProductCard', { product, csrfToken, session, returnTo }) %>
+            <% }); %>
+          </div>
+        <% } %>
+      </section>
+      <p class="shop-footer-note"><a class="shop-text-link" href="/shop">Back to all collections <span aria-hidden="true">↗</span></a></p>
+    <% } else if (typeof catalogueErrorMessage !== 'undefined' && catalogueErrorMessage) { %>
+      <section class="shop-migration">
+        <p class="shop-eyebrow">Pomi · Collection</p>
+        <h1>This collection is temporarily unavailable.</h1>
+        <p>Please try again in a little while.</p>
+        <a class="shop-button shop-button-dark" href="/shop">Back to Pet Shop</a>
+      </section>
+    <% } else { %>
+      <section class="shop-migration">
+        <p class="shop-eyebrow">Pomi · Collection</p>
+        <h1>We couldn't find that collection.</h1>
+        <p>This collection may no longer be available.</p>
+        <a class="shop-button shop-button-dark" href="/shop">Back to Pet Shop</a>
+      </section>
+    <% } %>
+  </main>
+</body>
+</html>

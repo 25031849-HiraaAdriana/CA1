@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#FFFFFF">
+  <meta name="description" content="Pomi brings your pet's care into one thoughtful place.">
+  <title>Pomi | A companion for pet care</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="/css/pomi-pages.css" rel="stylesheet">
+</head>
+<body class="pomi-page pomi-home-page">
+  <%- include('partials/navbar') %>
+
+  <main class="pomi-home-hero">
+    <div class="pomi-home-copy">
+      <p class="pomi-eyebrow pomi-animate pomi-animate-1"><span aria-hidden="true"></span> A companion for pet care</p>
+      <h1 class="pomi-animate pomi-animate-2">A little more care, <em>all in one place.</em></h1>
+      <p class="pomi-home-description pomi-animate pomi-animate-3">Keep the important parts of your pet's care close at hand, from their profile to their health records.</p>
+      <div class="pomi-home-actions pomi-animate pomi-animate-4">
+        <% if (!session || !session.user) { %>
+          <a class="pomi-button pomi-button-primary" href="/signup">Get Started <span aria-hidden="true">→</span></a>
+          <a class="pomi-button pomi-button-secondary" href="/login">Login</a>
+        <% } else if (session.user.role === 'admin') { %>
+          <a class="pomi-button pomi-button-primary" href="/admin/dashboard">Open admin dashboard <span aria-hidden="true">→</span></a>
+        <% } else { %>
+          <a class="pomi-button pomi-button-primary" href="/pets/new">Register a pet <span aria-hidden="true">→</span></a>
+          <a class="pomi-button pomi-button-secondary" href="/dashboard">Your dashboard</a>
+        <% } %>
+      </div>
+      <p class="pomi-home-note pomi-animate pomi-animate-4">Thoughtful tools for the everyday moments of pet care.</p>
+    </div>
+
+    <figure class="pomi-home-visual" data-pomi-parallax>
+      <img
+        src="/images/pomi-home-pets-hero-attached.png"
+        alt="A golden retriever, fluffy cat, lop-eared rabbit, guinea pig and hamster sitting together in a studio"
+        fetchpriority="high"
+        decoding="async">
+      <span class="pomi-visual-orbit pomi-visual-orbit-one" aria-hidden="true"></span>
+      <span class="pomi-visual-orbit pomi-visual-orbit-two" aria-hidden="true"></span>
+      <figcaption>For the pets who make a house feel like home.</figcaption>
+    </figure>
+
+    <span class="pomi-home-side-note" aria-hidden="true">POMI · PET CARE, THOUGHTFULLY</span>
+  </main>
+  <script src="/js/pomi-pages.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,1 @@
+SHOW TABLES FROM petcare LIKE 'appointments';

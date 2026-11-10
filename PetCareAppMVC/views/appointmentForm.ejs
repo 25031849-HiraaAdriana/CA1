@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title><%= appointmentId ? 'Edit' : 'Add' %> Appointment | Pomi</title>
+  <link rel="stylesheet" href="/css/user-medical-records.css">
+  <link rel="stylesheet" href="/css/appointments.css">
+</head>
+<body class="medical-page">
+  <%- include('partials/navbar') %>
+  <main class="medical-shell">
+    <% const formBackUrl = isAdmin ? '/admin/appointments' : '/dashboard'; %>
+    <a class="medical-back-link" href="<%= formBackUrl %>">← Back to <%= isAdmin ? 'appointments' : 'dashboard' %></a>
+    <header class="medical-page-heading">
+      <p class="medical-eyebrow">Pomi · Appointment tracker</p>
+      <h1><%= appointmentId ? 'Edit appointment' : 'Add appointment' %></h1>
+      <p>This only tracks your appointment; it does not book or contact a veterinary clinic. Times are in Singapore time.</p>
+    </header>
+    <% if (errorMessage) { %><div class="medical-alert" role="alert"><%= errorMessage %></div><% } %>
+    <section class="detail-card">
+      <% if (isAdmin) { %>
+        <% const formUrl = appointmentId ? `${base}/${encodeURIComponent(appointmentId)}/edit` : `${base}/new`; %>
+        <form class="appointment-search owner-search" method="get" action="<%= formUrl %>">
+          <div><label for="owner_search">1. Search registered owners</label><input id="owner_search" name="owner_search" type="search" maxlength="100" value="<%= ownerSearch %>" required></div>
+          <button class="medical-button medical-button-secondary" type="submit">Search owners</button>
+        </form>
+        <p class="medical-note">Search and select an owner before entering appointment details. Changing the owner reloads this form.</p>
+        <% if (ownerSearch) { %>
+          <% if (!owners.length) { %><p class="appointment-empty">No matching owners with registered pets.</p><% } else { %>
+            <p class="medical-note">Select an owner (showing up to 20 matches; refine your search if needed):</p>
+            <ul class="owner-results">
+              <% owners.forEach(owner => { %>
+                <li><a href="<%= formUrl %>?<%= new URLSearchParams({ owner_search: ownerSearch, owner_id: String(owner.id) }).toString() %>"><%= owner.name %> · User ID <%= owner.id %></a></li>
+              <% }); %>
+            </ul>
+          <% } %>
+        <% } %>
+        <% if (selectedOwner) { %>
+          <p class="selected-owner">Selected owner: <strong><%= selectedOwner.name %></strong> · User ID <%= selectedOwner.id %></p>
+        <% } else { %><p class="appointment-empty">Search for and select an owner first.</p><% } %>
+      <% } else { %>
+        <dl class="detail-fields">
+          <div><dt>Pet</dt><dd><%= appointment.pet_name %></dd></div>
+          <div><dt>Clinic</dt><dd><%= appointment.clinic_name %></dd></div>
+          <div><dt>Appointment type</dt><dd><%= appointment.appointment_type %></dd></div>
+        </dl>
+      <% } %>
+      <% if (!isAdmin || selectedOwner) { %>
+        <form class="appointment-form" method="post" action="<%= base %><%= appointmentId ? '/' + encodeURIComponent(appointmentId) : '' %>">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+          <% if (isAdmin) { %>
+            <input type="hidden" name="owner_id" value="<%= selectedOwner.id %>">
+            <label for="pet_id">2. Select a pet</label>
+            <select id="pet_id" name="pet_id" required>
+              <option value="">Select a pet</option>
+              <% pets.forEach(pet => { %><option value="<%= pet.id %>" <%= String(pet.id) === String(values.pet_id) ? 'selected' : '' %>><%= pet.name %> · Pet ID <%= pet.id %><%= pet.microchip_id ? ' · Microchip ' + pet.microchip_id : '' %><%= pet.avs_licence_number ? ' · AVS ' + pet.avs_licence_number : '' %></option><% }); %>
+            </select>
+            <% if (!pets.length) { %><p class="appointment-empty">This owner has no registered pets.</p><% } %>
+            <label for="clinic_name">Veterinary clinic name</label>
+            <input id="clinic_name" name="clinic_name" maxlength="150" value="<%= values.clinic_name %>" required>
+            <label for="appointment_type">Appointment type</label>
+            <select id="appointment_type" name="appointment_type" required>
+              <option value="">Select a type</option>
+              <% types.forEach(type => { %><option value="<%= type %>" <%= values.appointment_type === type ? 'selected' : '' %>><%= type %></option><% }); %>
+            </select>
+          <% } %>
+          <div class="appointment-form-row">
+            <div><label for="appointment_date">Date</label><input id="appointment_date" name="appointment_date" type="date" min="1000-01-01" max="9999-12-31" value="<%= values.appointment_date %>" required></div>
+            <div><label for="appointment_time">Time (Singapore)</label><input id="appointment_time" name="appointment_time" type="time" value="<%= values.appointment_time %>" required></div>
+          </div>
+          <% if (isAdmin) { %>
+            <label for="notes">Notes (optional)</label>
+            <textarea id="notes" name="notes" rows="4" maxlength="1000"><%= values.notes %></textarea>
+          <% } %>
+          <div class="appointment-actions">
+            <button type="submit" class="medical-button medical-button-primary"><%= appointmentId ? 'Save changes' : 'Add appointment' %></button>
+            <a class="medical-button medical-button-secondary" href="<%= formBackUrl %>">Back</a>
+          </div>
+        </form>
+      <% } %>
+    </section>
+  </main>
+</body>
+</html>

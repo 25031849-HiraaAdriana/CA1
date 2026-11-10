@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Refill Demo Cart | Pomi</title>
+  <link href="/css/user-medical-records.css" rel="stylesheet">
+</head>
+<body class="medical-page">
+  <%- include('partials/navbar') %>
+  <main class="medical-shell">
+    <a class="medical-back-link" href="/cart">← Pet Shop cart</a>
+    <header class="medical-page-heading">
+      <p class="medical-eyebrow">CA1 demonstration</p>
+      <h1>Medication refill demo cart</h1>
+      <p>Separate from Pet Shop products. No medication, stock, order, delivery or payment is provided. Payment is coming in CA2.</p>
+    </header>
+    <% if (!ready) { %>
+      <section class="detail-card">Refill requests are currently unavailable.</section>
+    <% } else if (!requests.length) { %>
+      <section class="detail-card">There are no accepted unpaid refill requests.</section>
+    <% } else { %>
+      <% requests.forEach(request => { %>
+        <article class="detail-card">
+          <h2><%= request.medication_name %></h2>
+          <p>Pet: <%= request.pet_name %> · Request #<%= request.id %></p>
+          <p>Requested quantity: <% if (request.requested_quantity != null && request.requested_quantity_unit) { %><%= request.requested_quantity %> <%= request.requested_quantity_unit %><% } else { %>not recorded for this historical request<% } %>.</p>
+          <form method="post" action="/refill-cart/<%= encodeURIComponent(request.id) %>/fulfilment">
+            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+            <label for="fulfilment-<%= request.id %>">Demonstration option</label>
+            <select id="fulfilment-<%= request.id %>" name="fulfilment">
+              <option value="collection" <%= !request.delivery ? 'selected' : '' %>>Collection · S$0.00</option>
+              <option value="delivery" <%= request.delivery ? 'selected' : '' %>>Delivery · S$10.00</option>
+            </select>
+            <button type="submit" class="medical-button medical-button-secondary">Update preview</button>
+          </form>
+          <dl class="detail-fields">
+            <div><dt>Admin quotation</dt><dd><%= request.quoteDisplay %></dd></div>
+            <div><dt>Demo delivery fee</dt><dd><%= request.feeDisplay %></dd></div>
+            <div><dt>Demo total</dt><dd><%= request.totalDisplay %></dd></div>
+          </dl>
+          <p class="medical-note">The option is stored only for this session. No checkout or payment is available.</p>
+        </article>
+      <% }); %>
+    <% } %>
+  </main>
+</body>
+</html>

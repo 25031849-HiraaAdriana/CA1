@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Edit User | Pomi Admin</title>
+</head>
+<body>
+  <%- include('partials/navbar') %>
+  <main class="pomi-admin-content">
+    <a class="medical-back-link" href="/admin/users/<%= user.id %>">← User details</a>
+    <header class="pomi-admin-dashboard-header">
+      <div>
+        <p class="pomi-admin-dashboard-kicker">Management · User #<%= user.id %></p>
+        <h1>Edit user details</h1>
+        <p>Update account name and username. The account role and password are unchanged.</p>
+      </div>
+    </header>
+    <section class="pomi-admin-panel pomi-admin-form-panel">
+      <% if (errorMessage) { %><p class="pomi-admin-alert pomi-admin-alert-danger" role="alert"><%= errorMessage %></p><% } %>
+      <form method="post" action="/admin/users/<%= user.id %>/edit" class="pomi-admin-form">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+        <label class="pomi-admin-field">
+          <span>Name</span>
+          <input type="text" name="name" maxlength="100" autocomplete="name" required value="<%= values.name %>">
+        </label>
+        <label class="pomi-admin-field">
+          <span>Username</span>
+          <input type="text" name="username" maxlength="50" autocomplete="username" required value="<%= values.username %>">
+        </label>
+        <div class="pomi-admin-actions">
+          <button class="pomi-admin-button pomi-admin-button-primary" type="submit">Save changes</button>
+          <a class="pomi-admin-button pomi-admin-button-secondary" href="/admin/users/<%= user.id %>">Cancel</a>
+        </div>
+      </form>
+    </section>
+  </main>
+</body>
+</html>

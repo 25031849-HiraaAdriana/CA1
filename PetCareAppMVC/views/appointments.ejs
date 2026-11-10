@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Appointments | Pomi</title>
+  <link rel="stylesheet" href="/css/user-medical-records.css">
+  <link rel="stylesheet" href="/css/appointments.css">
+</head>
+<body class="medical-page">
+  <%- include('partials/navbar') %>
+  <main class="medical-shell">
+    <a class="medical-back-link" href="/admin/dashboard">← Back to dashboard</a>
+    <header class="medical-page-heading appointment-header">
+      <div>
+        <p class="medical-eyebrow">Admin workspace</p>
+        <h1>Appointments</h1>
+        <p>Tracker only; this does not book or contact a clinic. Times are in Singapore time.</p>
+      </div>
+      <a class="medical-button medical-button-primary" href="<%= base %>/new">Add appointment</a>
+    </header>
+    <% if (successMessage) { %><div class="medical-alert medical-alert-success" role="status"><%= successMessage %></div><% } %>
+    <form class="appointment-search" method="get" action="<%= base %>">
+      <div>
+        <label for="appointment-search">Search owner, pet or clinic</label>
+        <input id="appointment-search" name="search" type="search" maxlength="100" value="<%= search %>">
+      </div>
+      <input type="hidden" name="filter" value="<%= filter %>">
+      <button class="medical-button medical-button-primary" type="submit">Search</button>
+    </form>
+    <nav class="appointment-filters" aria-label="Filter appointments">
+      <% for (const [value, label] of [['all', 'All'], ['upcoming', 'Upcoming'], ['past', 'Past'], ['cancelled', 'Cancelled']]) { %>
+        <% const params = new URLSearchParams({ search, filter: value }); %>
+        <a href="<%= base %>?<%= params.toString() %>" class="<%= filter === value ? 'selected' : '' %>" <%- filter === value ? 'aria-current="page"' : '' %>><%= label %></a>
+      <% } %>
+    </nav>
+    <section class="appointment-section" aria-label="Appointment results">
+      <% if (!appointments.length) { %><p class="appointment-empty">No appointments found.</p><% } else { %>
+        <div class="appointment-list">
+          <% appointments.forEach(item => { %>
+            <article class="record-card appointment-card">
+              <div class="appointment-summary">
+                <div><p class="medical-eyebrow"><%= item.appointment_type %> · <%= item.pet_name %></p><h2><%= item.clinic_name %></h2><p>Owner: <%= item.owner_name %></p></div>
+                <div><p class="appointment-date"><time datetime="<%= item.appointment_date %>T<%= item.appointment_time %>+08:00"><%= item.appointment_date %> · <%= item.appointment_time %></time> SGT</p><span class="record-category-label"><%= item.display_status %></span></div>
+              </div>
+              <% if (item.notes) { %><p class="appointment-notes"><%= item.notes %></p><% } %>
+              <p class="medical-note">Created by <%= item.creator_name %> · Last updated by <%= item.updater_name %></p>
+              <% if (item.status === 'scheduled') { %>
+                <div class="appointment-actions">
+                  <a class="medical-button medical-button-secondary" href="<%= base %>/<%= encodeURIComponent(item.id) %>/edit">Edit</a>
+                  <form method="post" action="<%= base %>/<%= encodeURIComponent(item.id) %>/cancel">
+                    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                    <button class="medical-button medical-button-secondary" type="submit">Cancel appointment</button>
+                  </form>
+                </div>
+              <% } %>
+            </article>
+          <% }); %>
+        </div>
+      <% } %>
+      <nav class="appointment-pagination" aria-label="Appointment pages">
+        <% if (page > 1) { %><a href="<%= base %>?<%= new URLSearchParams({ search, filter, page: String(page - 1) }).toString() %>">← Previous</a><% } %>
+        <span>Page <%= page %></span>
+        <% if (hasNext) { %><a href="<%= base %>?<%= new URLSearchParams({ search, filter, page: String(page + 1) }).toString() %>">Next →</a><% } %>
+      </nav>
+    </section>
+  </main>
+</body>
+</html>

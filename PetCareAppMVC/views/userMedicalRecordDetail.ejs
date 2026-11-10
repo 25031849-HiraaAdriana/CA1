@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#102A43">
+  <title><%= record.title %> | <%= pet.name %>'s Medical Records | Pomi</title>
+  <link href="/css/user-medical-records.css" rel="stylesheet">
+</head>
+<body class="medical-page">
+  <%- include('partials/navbar') %>
+  <main class="medical-shell">
+    <a class="medical-back-link" href="/pets/<%= encodeURIComponent(pet.id) %>/medical-records?category=<%= encodeURIComponent(record.category_code) %>">← Back to <%= record.category_name %></a>
+    <header class="medical-page-heading detail-heading">
+      <p class="medical-eyebrow">Digital Health Passport · <%= pet.name %></p>
+      <h1><%= record.title %></h1>
+      <span class="record-category-label"><%= record.category_name %></span>
+    </header>
+
+    <section class="detail-card" aria-labelledby="record-details-title">
+      <h2 id="record-details-title">Record details</h2>
+      <dl class="detail-fields">
+        <div><dt>Pet</dt><dd><%= pet.name %></dd></div>
+        <div><dt>Category</dt><dd><%= record.category_name %></dd></div>
+        <div><dt>Record title</dt><dd><%= record.title %></dd></div>
+        <div><dt>Clinic / source</dt><dd><%= record.source_name %></dd></div>
+        <div>
+          <dt>Record date</dt>
+          <dd><% if (record.displayRecordDate) { %><time datetime="<%= record.displayRecordDate %>"><%= record.displayRecordDate %></time><% } else { %>Not provided<% } %></dd>
+        </div>
+        <% if (record.description) { %>
+          <div class="detail-field-wide"><dt>Description</dt><dd><%= record.description %></dd></div>
+        <% } %>
+        <div class="detail-field-wide"><dt>Original document filename</dt><dd><%= record.original_filename %></dd></div>
+      </dl>
+    </section>
+
+    <% if (record.category_code === 'medication_history') { %>
+      <section class="detail-card" id="medication-details" aria-labelledby="medication-details-title">
+        <p class="medical-eyebrow">Admin-reviewed information</p>
+        <h2 id="medication-details-title">Medication details</h2>
+        <p class="medical-note">A school demonstration only; this is not a prescription, veterinary authorisation or medication supply.</p>
+        <% if (refillError) { %><div class="medical-alert" role="alert"><%= refillError %></div><% } %>
+        <% if (!refillFeatureReady) { %>
+          <p>Structured medication details are currently unavailable.</p>
+        <% } else if (!medicationEntries.length) { %>
+          <p>No structured medication details were entered for this record.</p>
+        <% } else { %>
+          <% medicationEntries.forEach(medication => { %>
+            <article class="record-card">
+              <h3><%= medication.medication_name %></h3>
+              <dl class="detail-fields">
+                <div><dt>Documented dosage</dt><dd><%= medication.dosage || 'Not provided' %></dd></div>
+                <div><dt>Documented frequency</dt><dd><%= medication.frequency || 'Not provided' %></dd></div>
+                <% if (medication.displayStartDate) { %><div><dt>Start date</dt><dd><%= medication.displayStartDate %></dd></div><% } %>
+                <% if (medication.displayEndDate) { %><div><dt>End date</dt><dd><%= medication.displayEndDate %></dd></div><% } %>
+              </dl>
+              <% if (medication.active_request_status) { %>
+                <p>Refill request: <strong><%= medication.active_request_status === 'Ready for Test Payment' ? 'Accepted with Demo Quotation' : medication.active_request_status %></strong></p>
+                <a class="medical-button medical-button-secondary" href="/pets/<%= encodeURIComponent(pet.id) %>/medical-records/refill-requests#request-<%= encodeURIComponent(medication.active_request_id) %>">View request</a>
+              <% } else { %>
+                <% if (medication.last_request_id) { %>
+                  <p>Most recent refill request: <strong><%= medication.last_request_status %></strong></p>
+                  <a class="medical-button medical-button-secondary" href="/pets/<%= encodeURIComponent(pet.id) %>/medical-records/refill-requests#request-<%= encodeURIComponent(medication.last_request_id) %>">View request</a>
+                <% } %>
+                <details class="refill-request">
+                  <summary class="medical-button medical-button-primary">Request Refill</summary>
+                  <form class="refill-request-form" method="post" action="/pets/<%= encodeURIComponent(pet.id) %>/medical-records/<%= encodeURIComponent(record.id) %>/refill-requests/<%= encodeURIComponent(medication.id) %>/new">
+                    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                    <input type="hidden" name="request_key" value="<%= medication.requestKey %>">
+                    <p><strong>Medication:</strong> <%= medication.medication_name %><br><strong>Documented dosage:</strong> <%= medication.dosage || 'Not provided' %></p>
+                    <label for="reason-<%= medication.id %>">Reason</label>
+                    <select id="reason-<%= medication.id %>" name="refill_reason" required>
+                      <option value="">Select a reason</option>
+                      <% refillReasons.forEach(reason => { %><option value="<%= reason %>"><%= reason %></option><% }); %>
+                    </select>
+                    <label for="quantity-<%= medication.id %>">Requested quantity</label>
+                    <input id="quantity-<%= medication.id %>" name="requested_quantity" type="number" min="1" max="4294967295" step="1" required>
+                    <% const documentedUnit = typeof medication.refill_quantity_unit === 'string' ? medication.refill_quantity_unit.trim() : ''; %>
+                    <% if (documentedUnit) { %>
+                      <label for="unit-<%= medication.id %>">Documented quantity unit</label>
+                      <input id="unit-<%= medication.id %>" name="requested_quantity_unit" value="<%= documentedUnit %>" readonly>
+                    <% } else { %>
+                      <label for="unit-<%= medication.id %>">DEMO quantity unit (required)</label>
+                      <select id="unit-<%= medication.id %>" name="requested_quantity_unit" required>
+                        <option value="">Select a DEMO unit</option>
+                        <% demoUnits.forEach(unit => { %><option value="<%= unit %>"><%= unit %></option><% }); %>
+                      </select>
+                      <p class="medical-note">No refill unit was documented. This selection is for the demo only; it is not veterinary verified and does not change the medical record.</p>
+                    <% } %>
+                    <button class="medical-button medical-button-primary" type="submit">Submit Request</button>
+                  </form>
+                </details>
+              <% } %>
+            </article>
+          <% }); %>
+        <% } %>
+      </section>
+    <% } %>
+
+    <section class="detail-card original-document" aria-labelledby="original-document-title">
+      <div>
+        <p class="medical-eyebrow">Private original file</p>
+        <h2 id="original-document-title">Original document</h2>
+        <p><%= record.original_filename %></p>
+      </div>
+      <div class="document-actions">
+        <a
+          class="medical-button medical-button-secondary"
+          href="/pets/<%= encodeURIComponent(pet.id) %>/medical-records/<%= encodeURIComponent(record.id) %>/document/preview"
+          target="_blank"
+          rel="noopener noreferrer"
+        >View Original Document</a>
+        <a
+          class="medical-button medical-button-primary"
+          href="/pets/<%= encodeURIComponent(pet.id) %>/medical-records/<%= encodeURIComponent(record.id) %>/document/download"
+        >Download Original Document</a>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

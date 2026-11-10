@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#102A43">
+  <title>Register a Pet | Pomi</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="/css/pethub-registration.css" rel="stylesheet">
+</head>
+<body class="registration-page">
+  <%- include('partials/navbar') %>
+
+  <main class="registration-shell">
+    <% if (registrationComplete) { %>
+      <nav class="step-progress" aria-label="Registration progress">
+        <ol>
+          <li class="is-complete"><span class="step-marker"><%- include('partials/progressPaw') %></span><span class="step-label">Introduction</span></li>
+            <li class="is-complete"><span class="step-marker"><%- include('partials/progressPaw') %></span><span class="step-label">Species &amp; Microchip</span></li>
+            <li class="is-complete"><span class="step-marker"><%- include('partials/progressPaw') %></span><span class="step-label">Pet Details</span></li>
+            <li class="is-complete"><span class="step-marker"><%- include('partials/progressPaw') %></span><span class="step-label">Review</span></li>
+            <li class="is-current" aria-current="step"><span class="step-marker"><%- include('partials/progressPaw') %></span><span class="step-label">Complete</span></li>
+        </ol>
+      </nav>
+
+      <section class="completion-card" aria-labelledby="completion-title">
+        <div class="completion-mark" aria-hidden="true">
+          <svg viewBox="0 0 48 48" focusable="false"><path d="m13 24 7 7 15-16"/></svg>
+        </div>
+        <p class="eyebrow">Registration complete</p>
+        <h1 id="completion-title">Pet Registered Successfully.</h1>
+        <p class="completion-lead"><strong><%= registeredPet.name %></strong> has been linked to your Pomi account.</p>
+        <div class="completion-actions">
+          <% if (registeredPet.profileUrl) { %>
+            <a class="button button-primary" href="<%= registeredPet.profileUrl %>">View pet profile</a>
+          <% } %>
+          <a class="button button-secondary" href="/pets/new">Register another pet</a>
+        </div>
+        <% if (registeredPet.profileUrl) { %>
+          <p class="completion-note">The Digital Health Passport is not available yet. This link opens the pet's registered profile.</p>
+        <% } else { %>
+          <p class="completion-note">The Digital Health Passport is not available yet. The registration succeeded, but a profile link could not be generated.</p>
+        <% } %>
+      </section>
+    <% } else { %>
+      <header class="registration-intro">
+        <p class="eyebrow">Pet health services</p>
+        <h1>Register your pet</h1>
+        <p>Create a digital profile for your pet and access Pomi's pet care services.</p>
+      </header>
+
+      <nav class="step-progress" aria-label="Registration progress">
+        <ol>
+          <li data-progress-step="1"><span class="step-marker"><%- include('partials/progressPaw') %></span><span class="step-label">Introduction</span></li>
+          <li data-progress-step="2"><span class="step-marker"><%- include('partials/progressPaw') %></span><span class="step-label">Species &amp; Microchip</span></li>
+          <li data-progress-step="3"><span class="step-marker"><%- include('partials/progressPaw') %></span><span class="step-label">Pet Details</span></li>
+          <li data-progress-step="4"><span class="step-marker"><%- include('partials/progressPaw') %></span><span class="step-label">Review</span></li>
+          <li data-progress-step="5"><span class="step-marker"><%- include('partials/progressPaw') %></span><span class="step-label">Complete</span></li>
+        </ol>
+      </nav>
+
+      <% if (resultMessage) { %>
+        <div class="registration-alert alert-<%= resultType %>" role="alert" aria-live="assertive">
+          <span class="alert-icon" aria-hidden="true">!</span>
+          <span><%= resultMessage %></span>
+          <% if (formData.species && ['dog', 'cat'].includes(formData.species.trim().toLowerCase())) { %>
+            <span class="alert-hint">Your entered details are retained. Please select the AVS licence PDF again to submit.</span>
+          <% } %>
+        </div>
+      <% } %>
+
+      <form action="/pets" method="POST" enctype="multipart/form-data" novalidate data-registration-wizard data-initial-step="<%= initialStep %>">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+        <section class="wizard-panel" data-wizard-step="1" aria-labelledby="step-one-title">
+          <div class="panel-icon" aria-hidden="true">
+            <svg viewBox="0 0 48 48" focusable="false"><path d="M24 5 39 11v11c0 10-6 17-15 21C15 39 9 32 9 22V11l15-6Z"/><path d="m17 24 5 5 10-11"/></svg>
+          </div>
+          <p class="eyebrow">Step 1 of 5</p>
+          <h2 id="step-one-title" tabindex="-1">Add your pet</h2>
+          <p class="panel-lead">Create a secure digital profile for your pet. Dogs and cats need their existing microchip ID and AVS licence document.</p>
+          <div class="information-panel">
+            <strong>What to have ready</strong>
+            <ul>
+              <li>Pet name, species, breed and age</li>
+              <li>For dogs and cats: microchip ID, AVS licence number and licence PDF downloaded from PALS</li>
+              <li>For rabbits, hamsters and guinea pigs: microchip ID if your pet has one</li>
+            </ul>
+          </div>
+          <div class="wizard-actions wizard-actions-end">
+            <button type="button" class="button button-primary" data-next>Get Started <span aria-hidden="true">→</span></button>
+          </div>
+        </section>
+
+        <section class="wizard-panel" data-wizard-step="2" aria-labelledby="step-two-title">
+          <p class="eyebrow">Step 2 of 5</p>
+          <h2 id="step-two-title" tabindex="-1">Species and microchip</h2>
+          <div class="field-group">
+            <label for="species">Species <span class="required-mark">Required</span></label>
+            <select class="form-control" id="species" name="species" required>
+              <option value="">Select a species</option>
+              <% ['Dog', 'Cat', 'Rabbit', 'Hamster', 'Guinea Pig'].forEach(species => { %>
+                <option value="<%= species %>" <%= (formData.species || '').trim().toLowerCase() === species.toLowerCase() ? 'selected' : '' %>><%= species %></option>
+              <% }); %>
+            </select>
+          </div>
+          <fieldset class="field-group" data-microchip-choice>
+            <legend>Does your pet have a microchip? (rabbits, hamsters and guinea pigs)</legend>
+            <label><input type="radio" name="has_microchip" value="yes" <%= formData.has_microchip === 'yes' ? 'checked' : '' %>> Yes</label>
+            <label><input type="radio" name="has_microchip" value="no" <%= formData.has_microchip === 'no' ? 'checked' : '' %>> No</label>
+          </fieldset>
+          <div class="field-group" data-microchip-field>
+            <label for="microchip_id">Microchip ID (MID) <span class="optional-mark">Required for dogs, cats and pets with a microchip</span></label>
+            <input type="text" class="form-control" id="microchip_id" name="microchip_id" maxlength="30" value="<%= formData.microchip_id || '' %>" autocomplete="off">
+            <span class="field-hint">Enter the ID exactly as recorded. It is treated as text, so leading zeros are kept.</span>
+          </div>
+          <div class="information-panel">
+            <strong>Where can I find the MID?</strong>
+            <p>Check your pet's existing microchip certificate or veterinary records. Pomi does not retrieve pet information from a government database.</p>
+          </div>
+          <div class="wizard-actions">
+            <button type="button" class="button button-secondary" data-back>Back</button>
+            <button type="button" class="button button-primary" data-next>Continue <span aria-hidden="true">→</span></button>
+          </div>
+        </section>
+
+        <section class="wizard-panel" data-wizard-step="3" aria-labelledby="step-three-title">
+          <p class="eyebrow">Step 3 of 5</p>
+          <h2 id="step-three-title" tabindex="-1">Confirm pet details</h2>
+          <p class="panel-lead">Enter the details for your pet's profile. Pet information is not filled in automatically from AVS or PALS.</p>
+
+          <div class="details-layout">
+            <div class="details-fields">
+              <div class="field-group">
+                <label for="pet_name">Pet name <span class="required-mark">Required</span></label>
+                <input type="text" class="form-control" id="pet_name" name="pet_name" maxlength="80" value="<%= formData.pet_name || '' %>" required>
+              </div>
+              <div class="field-group">
+                <label for="breed">Breed <span class="required-mark">Required</span></label>
+                <input type="text" class="form-control" id="breed" name="breed" maxlength="80" value="<%= formData.breed || '' %>" required>
+              </div>
+              <div class="field-group">
+                <label for="age">Age in years <span class="required-mark">Required</span></label>
+                <input type="number" class="form-control" id="age" name="age" min="0" max="255" step="1" value="<%= formData.age || '' %>" required>
+              </div>
+              <div class="field-group">
+                <label for="pet_image">Pet photo <span class="optional-mark">Optional</span></label>
+                <input type="file" class="form-control file-input" id="pet_image" name="pet_image" accept="image/*">
+                <span class="field-hint">Add a profile photo if you have one available.</span>
+              </div>
+            </div>
+
+            <aside class="pet-summary" aria-labelledby="summary-title">
+              <div class="summary-heading">
+                <span class="summary-avatar" aria-hidden="true">
+                  <svg viewBox="0 0 40 40" focusable="false"><circle cx="20" cy="21" r="11"/><circle cx="9" cy="12" r="3"/><circle cx="17" cy="8" r="3"/><circle cx="25" cy="8" r="3"/><circle cx="32" cy="13" r="3"/></svg>
+                </span>
+                <h3 id="summary-title">Pet information summary</h3>
+              </div>
+              <dl>
+                <div><dt>Name</dt><dd data-summary="pet_name">Not entered</dd></div>
+                <div><dt>Species</dt><dd data-summary="species">Not entered</dd></div>
+                <div><dt>Breed</dt><dd data-summary="breed">Not entered</dd></div>
+                <div><dt>Age</dt><dd data-summary="age">Not entered</dd></div>
+                <div><dt>Photo</dt><dd data-summary="pet_image">No photo selected</dd></div>
+              </dl>
+            </aside>
+          </div>
+
+          <div class="wizard-actions">
+            <button type="button" class="button button-secondary" data-back>Back</button>
+            <button type="button" class="button button-primary" data-next>Continue <span aria-hidden="true">→</span></button>
+          </div>
+        </section>
+
+        <section class="wizard-panel" data-wizard-step="4" aria-labelledby="step-four-title">
+          <p class="eyebrow">Step 4 of 5</p>
+          <h2 id="step-four-title" tabindex="-1">Review and register</h2>
+          <p class="panel-lead">Dogs and cats require an AVS licence document for local identifier comparison. Other supported species do not need one.</p>
+
+          <div class="confirmation-strip">
+            <span class="confirmation-label">Microchip ID entered</span>
+            <strong data-confirmation-mid><%= formData.microchip_id || 'Not entered yet' %></strong>
+          </div>
+
+          <div data-licence-fields>
+          <div class="field-group">
+            <label for="avs_licence_number">AVS Licence Number <span class="required-mark">Required</span></label>
+            <input type="text" class="form-control" id="avs_licence_number" name="avs_licence_number" maxlength="50" value="<%= formData.avs_licence_number || '' %>" autocomplete="off">
+          </div>
+          <div class="field-group">
+            <label for="avs_licence_document">AVS licence document (PDF) <span class="required-mark">Required</span></label>
+            <input type="file" class="form-control file-input" id="avs_licence_document" name="avs_licence_document" accept="application/pdf,.pdf">
+            <span class="field-hint">Select the PDF downloaded from PALS. Maximum file size: 5 MB.</span>
+          </div>
+
+          <div class="information-panel privacy-panel">
+            <strong>How document matching works</strong>
+            <p>Pomi extracts the labelled licence number and Microchip ID from this PDF and compares them locally with your entries. Documents without extractable text are not accepted. The document is not sent to AVS/PALS; this check is not official verification or proof of ownership.</p>
+          </div>
+          </div>
+
+          <div class="wizard-actions">
+            <button type="button" class="button button-secondary" data-back>Back</button>
+            <button type="submit" class="button button-primary">Register Pet</button>
+          </div>
+        </section>
+      </form>
+    <% } %>
+
+    <footer class="registration-footer">
+      <span>Pomi</span>
+      <span>Secure pet health services</span>
+    </footer>
+  </main>
+  <script src="/js/pet-registration-wizard.js" defer></script>
+</body>
+</html>

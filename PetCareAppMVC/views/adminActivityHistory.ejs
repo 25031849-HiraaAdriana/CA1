@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Admin Activity History | Pomi</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="/css/admin-medical-records.css" rel="stylesheet">
+</head>
+<body class="medical-records-page">
+  <%- include('partials/navbar') %>
+
+  <main class="container medical-records-shell">
+    <header class="medical-page-header">
+      <p class="medical-eyebrow">Admin operations</p>
+      <h1>Admin Activity History</h1>
+      <p>Review important administrative actions, including medical-record review, publication, and secure document access by authorised administrators.</p>
+    </header>
+
+    <% if (successMessage) { %>
+      <div class="alert alert-success" role="status"><%= successMessage %></div>
+    <% } %>
+    <% if (errorMessage) { %>
+      <div class="alert alert-danger" role="alert"><%= errorMessage %></div>
+    <% } %>
+
+    <% if (!migrationReady) { %>
+      <div class="alert alert-warning" role="alert">
+        Audit tables are not available yet. After the manual migration review and execution, this page will show live Admin activity history.
+      </div>
+    <% } %>
+
+    <section class="medical-panel">
+      <div class="medical-panel-heading">
+        <h2>Search by Admin Username</h2>
+      </div>
+
+      <form class="medical-search-form" method="get" action="/admin/activity-history">
+        <div class="row g-3">
+          <div class="col-12 col-md-8 col-lg-6">
+            <label class="form-label" for="admin_username">Search by Admin Username</label>
+            <input class="form-control" id="admin_username" name="admin_username" type="text" value="<%= adminUsername %>">
+          </div>
+          <div class="col-12 d-flex justify-content-end gap-2">
+            <a class="btn medical-secondary-button" href="/admin/activity-history">Clear Search</a>
+            <button class="btn medical-primary-button" type="submit">Search</button>
+          </div>
+        </div>
+      </form>
+    </section>
+
+    <section class="medical-panel">
+      <div class="medical-panel-heading">
+        <h2>Recent activity</h2>
+        <span class="medical-count"><%= totalRecords %> result(s)</span>
+      </div>
+
+      <% if (activities.length === 0) { %>
+        <p class="medical-empty-state">
+          <% if (adminUsername) { %>
+            No activities found for Admin username “<%= adminUsername %>”.
+          <% } else { %>
+            No admin activity records were found.
+          <% } %>
+        </p>
+      <% } else { %>
+        <div class="table-responsive medical-table-wrap">
+          <table class="table medical-table align-middle">
+            <thead>
+              <tr>
+                <th>Date and time</th>
+                <th>Admin username</th>
+                <th>Action</th>
+                <th>Pet</th>
+                <th>Medical record</th>
+                <th>Result</th>
+                <th>Details</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% activities.forEach(activity => { %>
+                <tr>
+                  <td><%= new Date(activity.created_at).toLocaleString() %></td>
+                  <td>
+                    <% if (activity.admin_username) { %>
+                      <span class="pet-name"><%= activity.admin_username %></span>
+                    <% } else { %>
+                      <span class="pet-subtitle">Unknown admin</span>
+                    <% } %>
+                  </td>
+                  <td><%= humanizeAction(activity.action_type) %></td>
+                  <td>
+                    <% if (activity.pet_id || activity.pet_name) { %>
+                      <span class="pet-name"><%= activity.pet_name || 'Unknown pet' %></span>
+                      <span class="pet-subtitle">ID <%= activity.pet_id || 'n/a' %></span>
+                    <% } else { %>
+                      <span class="pet-subtitle">N/A</span>
+                    <% } %>
+                  </td>
+                  <td>
+                    <% if (activity.medical_record_id) { %>
+                      <span class="pet-name">Record <%= activity.medical_record_id %></span>
+                    <% } else { %>
+                      <span class="pet-subtitle">None</span>
+                    <% } %>
+                  </td>
+                  <td>
+                    <span class="status-badge"><%= activity.action_result %></span>
+                  </td>
+                  <td>
+                    <% const metadata = activity.metadata; %>
+                    <% if (metadata && metadata.summary) { %>
+                      <span class="pet-subtitle"><%= metadata.summary %></span>
+                    <% } else { %>
+                      <span class="pet-subtitle">No further detail</span>
+                    <% } %>
+                  </td>
+                </tr>
+              <% }); %>
+            </tbody>
+          </table>
+        </div>
+      <% } %>
+
+      <% if (totalPages > 1) { %>
+        <nav class="mt-3" aria-label="Admin activity pagination">
+          <ul class="pagination mb-0">
+            <% const prevPage = Math.max(1, page - 1); %>
+            <% const nextPage = Math.min(totalPages, page + 1); %>
+            <% const usernameParameter = adminUsername ? `&admin_username=${encodeURIComponent(adminUsername)}` : ''; %>
+            <li class="page-item <%= page === 1 ? 'disabled' : '' %>">
+              <a class="page-link" href="/admin/activity-history?page=<%= prevPage %><%= usernameParameter %>">Previous</a>
+            </li>
+            <% for (let pageNumber = 1; pageNumber <= totalPages; pageNumber += 1) { %>
+              <li class="page-item <%= pageNumber === page ? 'active' : '' %>">
+                <a class="page-link" href="/admin/activity-history?page=<%= pageNumber %><%= usernameParameter %>"><%= pageNumber %></a>
+              </li>
+            <% } %>
+            <li class="page-item <%= page >= totalPages ? 'disabled' : '' %>">
+              <a class="page-link" href="/admin/activity-history?page=<%= nextPage %><%= usernameParameter %>">Next</a>
+            </li>
+          </ul>
+        </nav>
+      <% } %>
+    </section>
+  </main>
+</body>
+</html>

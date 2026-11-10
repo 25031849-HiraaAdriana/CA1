@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#102A43">
+  <meta name="description" content="Your Pomi dashboard for registered pets and upcoming pet healthcare services.">
+  <title>My Dashboard | Pomi</title>
+  <link href="/css/pethub-dashboard.css" rel="stylesheet">
+</head>
+<body class="pethub-page dashboard-page">
+  <%- include('partials/navbar') %>
+
+  <main class="dashboard-shell">
+    <div class="dashboard-layout">
+      <aside class="dashboard-mobile-reminders" aria-label="Dashboard reminders">
+        <details class="mobile-reminder mobile-emergency">
+          <summary>24-Hour Emergency <span>+65 6266 0232</span></summary>
+          <%- include('partials/emergencyVeterinaryPanel') %>
+        </details>
+        <% if (refillReady && refillReminders.length) { %>
+          <details class="mobile-reminder">
+            <summary>Medication Refill Payment Reminder</summary>
+            <%- include('partials/refillPaymentReminder') %>
+          </details>
+        <% } %>
+      </aside>
+      <div class="dashboard-main-content">
+    <% if (loginSuccessMessage) { %>
+      <p class="dashboard-alert dashboard-alert-success" role="status"><%= loginSuccessMessage %></p>
+    <% } %>
+    <% if (successMessage) { %><p class="dashboard-alert dashboard-alert-success" role="status"><%= successMessage %></p><% } %>
+    <% if (errorMessage) { %><p class="dashboard-alert" role="alert"><%= errorMessage %></p><% } %>
+    <% if (!refillReady) { %><p class="dashboard-alert" role="status">Refill reminders are currently unavailable.</p><% } %>
+    <section class="dashboard-hero" aria-labelledby="dashboard-title">
+      <div class="dashboard-hero-copy">
+        <p class="eyebrow">Pomi <span aria-hidden="true">/</span> Owner dashboard</p>
+        <p class="dashboard-greeting">Welcome back, <strong><%= session.user.name %></strong></p>
+        <h1 id="dashboard-title">Your pets, their care in one place.</h1>
+        <p class="dashboard-hero-description">View each registered pet's profile and published medical records in its Digital Health Passport.</p>
+      </div>
+    </section>
+
+    <section class="dashboard-shop-history dashboard-appointments" aria-labelledby="appointments-title">
+      <header class="section-heading dashboard-appointments-heading">
+        <div><p class="eyebrow">Plan their care</p><h2 id="appointments-title">Next appointment</h2></div>
+      </header>
+      <% if (typeof appointmentsAvailable === 'undefined' || !appointmentsAvailable) { %>
+        <p class="dashboard-history-empty">Appointments are currently unavailable.</p>
+      <% } else if (nextAppointment) { %>
+        <% const appointmentDateTime = new Date(`${nextAppointment.appointment_date}T${nextAppointment.appointment_time}:00+08:00`); %>
+        <% const appointmentDisplay = new Intl.DateTimeFormat('en-GB', {
+          timeZone: 'Asia/Singapore', day: 'numeric', month: 'short', year: 'numeric',
+          hour: 'numeric', minute: '2-digit', hour12: true
+        }).format(appointmentDateTime).replace(/\b(am|pm)\b/i, value => value.toUpperCase()); %>
+        <article class="dashboard-appointment-card">
+          <div class="dashboard-appointment-info">
+            <p class="dashboard-appointment-type"><%= nextAppointment.appointment_type %> · <%= nextAppointment.pet_name %></p>
+            <h3><%= nextAppointment.clinic_name %></h3>
+            <p class="dashboard-appointment-date"><time datetime="<%= nextAppointment.appointment_date %>T<%= nextAppointment.appointment_time %>+08:00"><%= appointmentDisplay %></time> (Singapore time)</p>
+          </div>
+          <div class="dashboard-appointment-actions">
+            <a class="dashboard-appointment-button dashboard-appointment-button-primary" href="/appointments/<%= encodeURIComponent(nextAppointment.id) %>/edit">Choose Another Date</a>
+            <form method="post" action="/appointments/<%= encodeURIComponent(nextAppointment.id) %>/cancel">
+              <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+              <button class="dashboard-appointment-button" type="submit" aria-label="Cancel appointment for <%= nextAppointment.pet_name %>">Cancel</button>
+            </form>
+          </div>
+        </article>
+      <% } else { %>
+        <p class="dashboard-history-empty">No upcoming appointments.</p>
+      <% } %>
+      <p class="dashboard-appointment-note">Tracking only; this does not book an appointment with a clinic.</p>
+    </section>
+
+    <section class="passport-section" id="digital-health-passport" aria-labelledby="passport-title">
+      <header class="section-heading passport-heading">
+        <div>
+          <p class="eyebrow">Your pet records</p>
+          <h2 id="passport-title">Digital Health Passport</h2>
+          <p>Each passport shows the registration details saved to your Pomi account.</p>
+        </div>
+        <span class="passport-count"><%= pets.length %> <%= pets.length === 1 ? 'pet' : 'pets' %> registered</span>
+      </header>
+
+      <% if (pets.length > 0) { %>
+        <div class="passport-list">
+          <% pets.forEach(pet => { %>
+            <article class="passport-card">
+              <div class="passport-photo">
+                <% if (pet.imageUrl) { %>
+                  <img src="<%= pet.imageUrl %>" alt="Photo of <%= pet.name %>">
+                <% } else { %>
+                  <div class="passport-photo-fallback" aria-label="No photo on file for <%= pet.name %>">
+                    <svg viewBox="0 0 64 64" aria-hidden="true">
+                      <ellipse cx="32" cy="40" rx="14" ry="11" />
+                      <ellipse cx="16" cy="24" rx="5" ry="7" transform="rotate(-28 16 24)" />
+                      <ellipse cx="28" cy="18" rx="5" ry="7" transform="rotate(-8 28 18)" />
+                      <ellipse cx="40" cy="19" rx="5" ry="7" transform="rotate(12 40 19)" />
+                      <ellipse cx="50" cy="27" rx="5" ry="7" transform="rotate(30 50 27)" />
+                    </svg>
+                    <small>No photo on file</small>
+                  </div>
+                <% } %>
+              </div>
+              <div class="passport-details">
+                <div class="passport-pet-heading">
+                  <div>
+                    <p class="eyebrow">Registered pet</p>
+                    <h3><%= pet.name %></h3>
+                    <p class="passport-breed"><%= pet.species %><span aria-hidden="true"> · </span><%= pet.breed %></p>
+                  </div>
+                  <span class="passport-status">Profile active</span>
+                </div>
+                <dl class="passport-identifiers">
+                  <div>
+                    <dt>AVS licence number</dt>
+                    <dd><%= pet.avs_licence_number || 'Not on file' %></dd>
+                  </div>
+                  <div>
+                    <dt>Microchip ID</dt>
+                    <dd><%= pet.microchip_id || 'Not on file' %></dd>
+                  </div>
+                </dl>
+                <div class="passport-actions">
+                  <a class="text-action" href="/pets/<%= encodeURIComponent(pet.id) %>">
+                    View pet profile <span aria-hidden="true">→</span>
+                  </a>
+                  <a class="dashboard-button dashboard-button-primary passport-open-button" href="/pets/<%= encodeURIComponent(pet.id) %>/medical-records">
+                    View Health Passport <span aria-hidden="true">→</span>
+                  </a>
+                </div>
+              </div>
+            </article>
+          <% }); %>
+        </div>
+      <% } else { %>
+        <div class="passport-empty-state">
+          <div class="empty-state-mark" aria-hidden="true">+</div>
+          <div>
+            <p class="eyebrow">Your passport starts here</p>
+            <h3>No pets registered yet</h3>
+            <p>Add your first pet to create a profile with its saved identification details.</p>
+            <a class="dashboard-button dashboard-button-primary" href="/pets/new">Register your first pet</a>
+          </div>
+        </div>
+      <% } %>
+
+      <a class="register-another-link" href="/pets/new">
+        <span aria-hidden="true">+</span> Register another pet
+      </a>
+    </section>
+
+    <section class="dashboard-shop-history" aria-labelledby="favourites-title">
+      <header class="section-heading dashboard-history-heading">
+        <div>
+          <p class="eyebrow">Saved for later</p>
+          <h2 id="favourites-title">My Favourites</h2>
+        </div>
+        <a class="text-action" href="/shop">Browse PetHub Products <span aria-hidden="true">→</span></a>
+      </header>
+      <% if (!shopHistoryReady) { %>
+        <p class="dashboard-history-empty">Shop favourites will be available after the storefront migration is reviewed and applied.</p>
+      <% } else if (favourites.length) { %>
+        <div class="dashboard-shop-grid">
+          <% favourites.forEach(product => { %>
+            <article class="dashboard-shop-card">
+              <div class="dashboard-shop-image-wrap">
+                <% if (product.isAvailable) { %>
+                  <a class="dashboard-shop-image-link" href="/shop/products/<%= product.id %>" aria-label="View <%= product.product_name %>">
+                    <% if (product.image_path) { %><img src="<%= product.image_path %>" alt="<%= product.product_name %>" loading="lazy"><% } else { %><span class="dashboard-shop-image-fallback">Product photo not supplied</span><% } %>
+                  </a>
+                <% } else if (product.image_path) { %>
+                  <img src="<%= product.image_path %>" alt="<%= product.product_name %>" loading="lazy">
+                <% } else { %>
+                  <div class="dashboard-shop-image-fallback">Product photo not supplied</div>
+                <% } %>
+                <form class="dashboard-favourite-form" method="post" action="/shop/favourites/<%= product.id %>">
+                  <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                  <input type="hidden" name="return_to" value="/dashboard">
+                  <input type="hidden" name="action" value="remove">
+                  <button class="dashboard-favourite-heart" type="submit" aria-label="Remove <%= product.product_name %> from favourites">♥</button>
+                </form>
+              </div>
+              <div class="dashboard-shop-card-copy">
+                <% if (product.isAvailable) { %><a href="/shop/products/<%= product.id %>"><h3><%= product.product_name %></h3></a><% } else { %><h3><%= product.product_name %></h3><p class="dashboard-unavailable">Currently unavailable</p><% } %>
+                <p class="dashboard-shop-price">S$<%= Number(product.price_sgd).toFixed(2) %></p>
+              </div>
+            </article>
+          <% }); %>
+        </div>
+      <% } else { %>
+        <p class="dashboard-history-empty">Products you favourite in the Pet Shop will appear here.</p>
+      <% } %>
+    </section>
+
+    <section class="dashboard-shop-history" aria-labelledby="recently-viewed-title">
+      <header class="section-heading dashboard-history-heading">
+        <div>
+          <p class="eyebrow">Your browsing</p>
+          <h2 id="recently-viewed-title">Recently Viewed</h2>
+        </div>
+        <% if (recentlyViewed.length) { %>
+          <form method="post" action="/dashboard/recently-viewed/clear">
+            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+            <button class="dashboard-history-remove" type="submit">Clear history</button>
+          </form>
+        <% } %>
+      </header>
+      <% if (!shopHistoryReady) { %>
+        <p class="dashboard-history-empty">Recently viewed products will appear here when the storefront history feature is available.</p>
+      <% } else if (recentlyViewed.length) { %>
+        <div class="dashboard-shop-grid">
+          <% recentlyViewed.forEach(product => { %>
+            <article class="dashboard-shop-card">
+              <div class="dashboard-shop-image-wrap">
+                <% if (product.isAvailable) { %>
+                  <a class="dashboard-shop-image-link" href="/shop/products/<%= product.id %>" aria-label="View <%= product.product_name %>">
+                    <% if (product.image_path) { %><img src="<%= product.image_path %>" alt="<%= product.product_name %>" loading="lazy"><% } else { %><span class="dashboard-shop-image-fallback">Product photo not supplied</span><% } %>
+                  </a>
+                <% } else if (product.image_path) { %>
+                  <img src="<%= product.image_path %>" alt="<%= product.product_name %>" loading="lazy">
+                <% } else { %>
+                  <div class="dashboard-shop-image-fallback">Product photo not supplied</div>
+                <% } %>
+              </div>
+              <div class="dashboard-shop-card-copy">
+                <% if (product.isAvailable) { %><a href="/shop/products/<%= product.id %>"><h3><%= product.product_name %></h3></a><p class="dashboard-shop-price">S$<%= Number(product.price_sgd).toFixed(2) %></p><% } else { %><h3><%= product.product_name %></h3><p class="dashboard-unavailable">Currently unavailable</p><% } %>
+              </div>
+            </article>
+          <% }); %>
+        </div>
+      <% } else { %>
+        <p class="dashboard-history-empty">Products you open in the Pet Shop will appear here, with the newest first.</p>
+      <% } %>
+    </section>
+      </div>
+      <aside class="dashboard-emergency-sidebar" aria-label="Dashboard reminders">
+        <%- include('partials/emergencyVeterinaryPanel') %>
+        <% if (refillReady && refillReminders.length) { %>
+          <%- include('partials/refillPaymentReminder') %>
+        <% } %>
+      </aside>
+    </div>
+  </main>
+
+  <footer class="dashboard-footer">
+    <p>Pomi · Your pet care records in one place.</p>
+  </footer>
+</body>
+</html>

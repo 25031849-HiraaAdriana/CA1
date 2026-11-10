@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#102A43">
+  <title>My Refill Requests | Pomi</title>
+  <link href="/css/user-medical-records.css" rel="stylesheet">
+</head>
+<body class="medical-page">
+  <%- include('partials/navbar') %>
+  <main class="medical-shell">
+    <a class="medical-back-link" href="/pets/<%= encodeURIComponent(pet.id) %>/medical-records?category=medication_history">← Back to Medication History</a>
+    <header class="medical-page-heading">
+      <p class="medical-eyebrow">Digital Health Passport · School demonstration</p>
+      <h1><%= pet.name %>'s Refill Requests</h1>
+      <p>Requests are simulated for CA1 and are not veterinary authorisation or medication supply.</p>
+      <p class="payment-coming-soon">Payment is Coming in CA2. No Pay button or transaction is available in CA1.</p>
+    </header>
+
+    <% if (submitted === 'yes') { %><div class="medical-alert medical-alert-success" role="status">Demonstration refill request submitted as Pending.</div><% } %>
+    <% if (submitted === 'again') { %><div class="medical-alert" role="status">This form was already submitted. The existing request is shown below.</div><% } %>
+    <% if (submitted === 'existing') { %><div class="medical-alert" role="status">An active request already exists for that medication.</div><% } %>
+
+    <% if (!featureReady) { %>
+      <section class="medical-empty-state">
+        <h2>Refill request demonstration is not yet available.</h2>
+        <p>The proposed additive migration must be reviewed and applied before request tracking is enabled.</p>
+      </section>
+    <% } else if (requests.length) { %>
+      <div class="record-card-list">
+        <% requests.forEach(request => { %>
+          <article class="record-card" id="request-<%= request.id %>">
+            <div class="record-card-heading">
+              <div>
+                <h2><%= request.medication_name %></h2>
+                <p class="record-source"><%= request.record_title %></p>
+              </div>
+              <span class="record-category-label"><%= request.status === 'Ready for Test Payment' ? 'Accepted with Demo Quotation' : request.status %></span>
+            </div>
+            <% if (request.dosage || request.frequency) { %>
+              <p><% if (request.dosage) { %>Documented dosage: <%= request.dosage %><% } %><% if (request.dosage && request.frequency) { %> · <% } %><% if (request.frequency) { %>Documented frequency: <%= request.frequency %><% } %></p>
+            <% } %>
+            <% if (request.refill_reason) { %><p><strong>Reason:</strong> <%= request.refill_reason %></p><% } %>
+            <% if (request.requested_quantity != null && request.requested_quantity_unit) { %><p><strong>Requested quantity:</strong> <%= request.requested_quantity %> <%= request.requested_quantity_unit %></p><% } %>
+            <% if (request.message) { %><p><strong>Your message:</strong> <%= request.message %></p><% } %>
+            <% if (request.admin_review_note) { %><p><strong>Administrative demo review:</strong> <%= request.admin_review_note %></p><% } %>
+            <% if (request.displayPrice) { %><p><strong>Demo quotation:</strong> <%= request.displayPrice %></p><% } %>
+            <% if (request.status === 'Ready for Test Payment') { %>
+              <p class="payment-coming-soon">Payment is Coming in CA2. No payment can be made in this demonstration.</p>
+              <a class="medical-button medical-button-secondary" href="/refill-cart">View demo cart</a>
+            <% } %>
+            <% if (request.status === 'Paid') { %><p class="payment-coming-soon">Paid status is reserved for CA2; no payment was processed in CA1.</p><% } %>
+            <p class="medical-note">Administrative demo review is not veterinary authorisation.</p>
+          </article>
+        <% }); %>
+      </div>
+    <% } else { %>
+      <section class="medical-empty-state">
+        <h2>No refill requests yet.</h2>
+        <p>Eligible structured medications in Medication History can be used to create a demonstration request.</p>
+      </section>
+    <% } %>
+  </main>
+</body>
+</html>

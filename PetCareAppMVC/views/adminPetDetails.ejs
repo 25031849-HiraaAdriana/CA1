@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title><%= pet.name %> | Pomi Admin</title>
+</head>
+<body>
+  <%- include('partials/navbar') %>
+  <main class="pomi-admin-content">
+    <a class="medical-back-link" href="/admin/users/<%= pet.owner_id %>">← Owner details · <%= pet.owner_name %></a>
+    <header class="pomi-admin-dashboard-header">
+      <div>
+        <p class="pomi-admin-dashboard-kicker">Pomi Pet ID #<%= pet.id %></p>
+        <h1><%= pet.name %></h1>
+        <p><%= pet.species %> · <%= pet.breed %> · <%= pet.age %> <%= Number(pet.age) === 1 ? 'year' : 'years' %></p>
+      </div>
+      <a class="pomi-admin-button pomi-admin-button-primary" href="/admin/pets/<%= pet.id %>/edit">Edit pet</a>
+    </header>
+    <section class="pomi-admin-pet-detail-grid">
+      <article class="pomi-admin-panel pomi-admin-pet-detail-card">
+        <% if (pet.imageUrl) { %>
+          <img class="pomi-admin-pet-detail-image" src="<%= pet.imageUrl %>" alt="Photo of <%= pet.name %>">
+        <% } else { %>
+          <div class="pomi-admin-pet-detail-image pomi-admin-pet-image-empty" role="img" aria-label="No photo on file for <%= pet.name %>">No photo on file</div>
+        <% } %>
+        <dl class="pomi-admin-pet-facts">
+          <div><dt>Owner</dt><dd><a href="/admin/users/<%= pet.owner_id %>"><%= pet.owner_name %></a></dd></div>
+          <div><dt>Status</dt><dd><span class="pomi-admin-status<%= pet.status === 'deceased' ? ' is-deceased' : '' %>"><%= pet.status === 'deceased' ? 'Deceased' : 'Active' %></span></dd></div>
+          <div><dt>AVS licence number</dt><dd><%= pet.avs_licence_number || 'Not recorded' %></dd></div>
+          <div><dt>Microchip ID (MID)</dt><dd><%= pet.microchip_id || 'Not recorded' %></dd></div>
+        </dl>
+      </article>
+      <article class="pomi-admin-panel pomi-admin-pet-history">
+        <p class="pomi-admin-dashboard-kicker">Preserved history</p>
+        <h2>Pet records</h2>
+        <p>Medical documents, publication signatures, appointments and refill history remain attached to Pomi Pet ID #<%= pet.id %>.</p>
+        <a class="pomi-admin-button pomi-admin-button-secondary" href="/admin/medical-records?petId=<%= pet.id %>">Open medical records</a>
+        <% if (pet.status === 'active') { %>
+          <a class="pomi-admin-button pomi-admin-button-danger" href="/admin/pets/<%= pet.id %>/deceased">Mark as deceased</a>
+        <% } else { %>
+          <p class="pomi-admin-alert pomi-admin-alert-danger">This is an internal Pomi inactive status. It does not update AVS/PALS licensing records.</p>
+        <% } %>
+      </article>
+    </section>
+  </main>
+</body>
+</html>

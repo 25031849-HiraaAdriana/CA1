@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title><%= product.product_name %> | Pomi</title>
+  <script src="/js/pet-shop.js" defer></script>
+</head>
+<body class="shop-page">
+  <%- include('partials/navbar') %>
+  <main class="shop-product-detail">
+    <nav class="shop-breadcrumb" aria-label="Breadcrumb">
+      <a href="/shop">Pet Shop</a><span aria-hidden="true">/</span>
+      <% if (product.trusted_brand_code) { %>
+        <a href="/shop/brands/<%= encodeURIComponent(product.trusted_brand_code) %>"><%= product.trusted_brand_name %></a><span aria-hidden="true">/</span>
+      <% } %>
+      <span aria-current="page"><%= product.product_name %></span>
+    </nav>
+    <% if (successMessage) { %><p class="shop-notice" role="status"><%= successMessage %></p><% } %>
+    <% if (errorMessage) { %><p class="shop-notice shop-notice-error" role="alert"><%= errorMessage %></p><% } %>
+    <div class="shop-detail-grid">
+      <div class="shop-gallery">
+        <% if (product.images && product.images.length) { %>
+          <div class="shop-gallery-main">
+            <img data-gallery-main src="<%= product.images[0].image_path %>" alt="<%= product.images[0].alt_text %>">
+          </div>
+          <% if (product.images.length > 1) { %>
+            <div class="shop-gallery-thumbs">
+              <% product.images.forEach((image, index) => { %>
+                <button type="button" class="shop-gallery-thumb <%= index === 0 ? 'is-selected' : '' %>" data-gallery-image="<%= image.image_path %>" data-gallery-alt="<%= image.alt_text %>" aria-label="Show product image <%= index + 1 %>">
+                  <img src="<%= image.image_path %>" alt="" loading="lazy">
+                </button>
+              <% }); %>
+            </div>
+          <% } %>
+        <% } else { %>
+          <div class="shop-gallery-main shop-image-unavailable">Product photo not supplied</div>
+        <% } %>
+      </div>
+      <section class="shop-detail-copy">
+        <p class="shop-eyebrow"><%= product.category_name %></p>
+        <p class="shop-product-brand"><%= product.brand || 'Thoughtfully selected' %></p>
+        <h1><%= product.product_name %></h1>
+        <p class="shop-detail-description"><%= product.description %></p>
+        <% if (session && session.user && session.user.role === 'user') { %>
+          <form class="shop-detail-favourite" method="post" action="/shop/favourites/<%= product.id %>">
+            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+            <input type="hidden" name="return_to" value="/shop/products/<%= product.id %>">
+            <input type="hidden" name="action" value="<%= Number(product.is_favourite) === 1 ? 'remove' : 'add' %>">
+            <button class="shop-favourite-button <%= Number(product.is_favourite) === 1 ? 'is-favourite' : '' %>" type="submit">
+              <span aria-hidden="true"><%= Number(product.is_favourite) === 1 ? '♥' : '♡' %></span>
+              <%= Number(product.is_favourite) === 1 ? 'Remove from favourites' : 'Add to favourites' %>
+            </button>
+          </form>
+        <% } %>
+        <p class="shop-detail-price">SGD <%= Number(product.price_sgd).toFixed(2) %></p>
+        <% if (Number(product.stock_quantity) > 0) { %>
+          <p class="shop-stock">In stock · <%= product.stock_quantity %> available</p>
+          <% if (session && session.user && session.user.role === 'user') { %>
+            <form class="shop-add-form" method="post" action="/cart/items/<%= product.id %>">
+              <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+              <label for="product-quantity">Quantity</label>
+              <input id="product-quantity" type="number" name="quantity" value="1" min="1" max="<%= Math.min(99, product.stock_quantity) %>" required>
+              <button class="shop-button shop-button-dark" type="submit">Add to cart</button>
+            </form>
+          <% } else { %>
+            <a class="shop-button shop-button-dark" href="/login">Sign in to add to cart</a>
+          <% } %>
+        <% } else { %>
+          <p class="shop-stock shop-stock-out">Currently out of stock</p>
+        <% } %>
+        <p class="shop-internal-status">Pomi internal listing status: Approved for Internal Listing. This is an internal decision only and is not an official government approval or endorsement.</p>
+      </section>
+    </div>
+
+    <section class="shop-information-grid">
+      <article><h2>Intended use</h2><p><%= product.intended_purpose || 'No intended-use details provided.' %></p></article>
+      <article><h2>Ingredients or materials</h2><p><%= product.ingredients_materials || 'No ingredient or material details provided.' %></p></article>
+      <article><h2>Species and age suitability</h2>
+        <p><%= product.species_suitability.join(', ') %></p>
+        <% if (product.minimum_age_months !== null || product.maximum_age_months !== null) { %>
+          <p>Age range: <%= product.minimum_age_months === null ? 'Any' : product.minimum_age_months %>–<%= product.maximum_age_months === null ? 'Any' : product.maximum_age_months %> months.</p>
+        <% } %>
+      </article>
+      <article><h2>How to use</h2><p><%= product.usage_instructions || 'Follow the instructions supplied with the product.' %></p></article>
+      <article class="shop-safety"><h2>Safety information</h2><p><%= product.safety_warnings || 'No additional safety warnings provided. Review the supplier packaging before use.' %></p></article>
+      <article><h2>Supplier details</h2>
+        <p><%= product.supplier_name || 'Supplier details not provided.' %></p>
+        <% if (product.country_of_origin) { %><p>Origin: <%= product.country_of_origin %></p><% } %>
+        <% if (product.supplier_reference) { %><p>Supplier reference: <%= product.supplier_reference %></p><% } %>
+      </article>
+      <% if (product.expiry_date) { %><article><h2>Expiry</h2><p><%= new Date(product.expiry_date).toLocaleDateString() %></p></article><% } %>
+      <% if (product.supporting_document_reference) { %><article><h2>Submitted supporting documents</h2><p><%= product.supporting_document_reference %></p></article><% } %>
+      <% if (product.regulatory_authority_reference || product.submitted_licence_number) { %>
+        <article><h2>Submitted regulatory references</h2>
+          <% if (product.regulatory_authority_reference) { %><p><%= product.regulatory_authority_reference %></p><% } %>
+          <% if (product.submitted_licence_number) { %><p>Submitted identifier: <%= product.submitted_licence_number %></p><% } %>
+          <p class="shop-disclaimer">References are recorded as submitted; Pomi does not imply official verification or endorsement.</p>
+        </article>
+      <% } %>
+    </section>
+  </main>
+</body>
+</html>

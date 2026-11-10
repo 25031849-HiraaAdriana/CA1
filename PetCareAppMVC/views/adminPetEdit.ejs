@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Edit Pet | Pomi Admin</title>
+</head>
+<body>
+  <%- include('partials/navbar') %>
+  <main class="pomi-admin-content">
+    <a class="medical-back-link" href="/admin/pets/<%= pet.id %>">← Pet details</a>
+    <header class="pomi-admin-dashboard-header">
+      <div>
+        <p class="pomi-admin-dashboard-kicker">Pomi Pet ID #<%= pet.id %> · Owner <%= pet.owner_name %></p>
+        <h1>Edit pet details</h1>
+        <p>Pet ownership and internal Pomi ID cannot be changed here.</p>
+      </div>
+    </header>
+    <section class="pomi-admin-panel pomi-admin-form-panel">
+      <% if (errorMessage) { %><p class="pomi-admin-alert pomi-admin-alert-danger" role="alert"><%= errorMessage %></p><% } %>
+      <form method="post" action="/admin/pets/<%= pet.id %>/edit" enctype="multipart/form-data" class="pomi-admin-form">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+        <div class="pomi-admin-form-grid">
+          <label class="pomi-admin-field">
+            <span>Pet name</span>
+            <input type="text" name="pet_name" maxlength="80" required value="<%= values.pet_name %>">
+          </label>
+          <label class="pomi-admin-field">
+            <span>Species</span>
+            <select name="species" required>
+              <% ['Dog', 'Cat', 'Rabbit', 'Hamster', 'Guinea Pig'].forEach(species => { %>
+                <option value="<%= species %>" <%= values.species.toLowerCase() === species.toLowerCase() ? 'selected' : '' %>><%= species %></option>
+              <% }) %>
+            </select>
+          </label>
+          <label class="pomi-admin-field">
+            <span>Breed</span>
+            <input type="text" name="breed" maxlength="80" required value="<%= values.breed %>">
+          </label>
+          <label class="pomi-admin-field">
+            <span>Age (years)</span>
+            <input type="number" name="age" min="0" max="255" step="1" required value="<%= values.age %>">
+          </label>
+          <label class="pomi-admin-field">
+            <span>AVS licence number</span>
+            <input type="text" name="avs_licence_number" maxlength="50" value="<%= values.avs_licence_number %>">
+          </label>
+          <label class="pomi-admin-field">
+            <span>Microchip ID (MID)</span>
+            <input type="text" name="microchip_id" maxlength="30" value="<%= values.microchip_id %>">
+          </label>
+        </div>
+        <p class="pomi-admin-form-note">
+          Dogs and cats must retain both identifiers. Any dog/cat identifier correction needs the supporting AVS PDF, local identifier matching and a correction reason. Local matching is not government verification. Other species retain optional microchip rules; a dog/cat cannot be changed to another species here if that would clear its identifiers.
+        </p>
+        <label class="pomi-admin-field">
+          <span>Correction reason <small>Required only when changing an identifier</small></span>
+          <textarea name="correction_reason" rows="2" maxlength="500"><%= values.correction_reason %></textarea>
+        </label>
+        <label class="pomi-admin-field">
+          <span>Supporting AVS licence PDF <small>Required for dog/cat identifier corrections · max 5 MB</small></span>
+          <input type="file" name="avs_licence_document" accept="application/pdf">
+        </label>
+        <label class="pomi-admin-field">
+          <span>Replace pet photograph <small>JPEG, PNG or WebP · max 5 MB</small></span>
+          <input type="file" name="pet_image" accept="image/jpeg,image/png,image/webp">
+        </label>
+        <% if (pet.imageUrl) { %>
+          <div class="pomi-admin-current-photo">
+            <span>Current photo</span>
+            <img src="<%= pet.imageUrl %>" alt="Current photo of <%= pet.name %>">
+          </div>
+        <% } else { %>
+          <p class="pomi-admin-form-note">No pet photo is currently on file. Leave the photo field empty to keep it that way.</p>
+        <% } %>
+        <div class="pomi-admin-actions">
+          <button class="pomi-admin-button pomi-admin-button-primary" type="submit">Save changes</button>
+          <a class="pomi-admin-button pomi-admin-button-secondary" href="/admin/pets/<%= pet.id %>">Cancel</a>
+        </div>
+      </form>
+    </section>
+  </main>
+</body>
+</html>

@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Browse Pomi products, trusted pet brands and alternative pet shops.">
+  <title>Pet Shop | Pomi</title>
+  <script src="/js/pet-shop.js" defer></script>
+</head>
+<body class="shop-page">
+  <%- include('partials/navbar') %>
+  <main class="shop-storefront">
+    <% if (errorMessage) { %><p class="shop-notice shop-notice-error" role="alert"><%= errorMessage %></p><% } %>
+    <% if (typeof catalogueErrorMessage !== 'undefined' && catalogueErrorMessage) { %><p class="shop-notice shop-notice-error" role="alert"><%= catalogueErrorMessage %></p><% } %>
+    <% if (successMessage) { %><p class="shop-notice" role="status"><%= successMessage %></p><% } %>
+    <% if (!migrationReady) { %>
+      <section class="shop-migration" aria-labelledby="shop-migration-title">
+        <p class="shop-eyebrow">Pomi · A considered collection</p>
+        <h1 id="shop-migration-title">The shop is getting ready.</h1>
+        <p>Review and apply the existing Pet Shop migration and additive storefront migration before browsing. Existing products and cart data are not changed by this page.</p>
+      </section>
+    <% } else { %>
+      <section class="shop-banner" aria-label="Pomi shop">
+        <div class="shop-banner-copy">
+          <p class="shop-eyebrow">Pomi · A considered collection</p>
+          <h1>Pomi</h1>
+          <p class="shop-banner-subtitle">Thoughtful finds for pets and their people.</p>
+        </div>
+        <img class="shop-banner-photo" src="/images/pethub-shop-banner.webp" alt="A rabbit, guinea pig and hamster with pet-care products in a muted grey studio setting">
+      </section>
+
+      <section class="shop-section shop-products shop-house-products" id="pomi-products" aria-labelledby="pomi-products-title">
+        <div class="shop-section-heading">
+          <div>
+            <p class="shop-eyebrow">Pomi</p>
+            <h2 id="pomi-products-title">Pomi Products</h2>
+          </div>
+          <p><%= products.length %> eligible product<%= products.length === 1 ? '' : 's' %></p>
+        </div>
+        <form class="shop-filters shop-storefront-filters" method="get" action="/shop">
+          <label>
+            <span>Search Products</span>
+            <input type="search" name="search" value="<%= filters.search || '' %>" placeholder="Search products">
+          </label>
+          <label>
+            <span>Age Category</span>
+            <select name="age_category">
+              <option value="">Any age suitability</option>
+              <option value="age-limited" <%= filters.ageCategory === 'age-limited' ? 'selected' : '' %>>Age range recorded</option>
+              <option value="no-age-limit" <%= filters.ageCategory === 'no-age-limit' ? 'selected' : '' %>>No age limit recorded</option>
+            </select>
+          </label>
+          <label>
+            <span>Animal Species</span>
+            <select name="species">
+              <option value="">All species</option>
+              <% speciesOptions.forEach(species => { %>
+                <option value="<%= species %>" <%= filters.species === species ? 'selected' : '' %>><%= species %></option>
+              <% }); %>
+            </select>
+          </label>
+          <label>
+            <span>Price Range</span>
+            <select name="price_range">
+              <% priceRanges.forEach(range => { %>
+                <option value="<%= range.value %>" <%= filters.priceRange === range.value ? 'selected' : '' %>><%= range.label %></option>
+              <% }); %>
+            </select>
+          </label>
+          <button class="shop-button shop-button-dark" type="submit">Search</button>
+        </form>
+        <p class="shop-filter-note">Age options describe whether age-in-months suitability is recorded for the selected species; they do not imply veterinary age categories.</p>
+        <% if (!products.length) { %>
+          <p class="shop-empty" role="status"><%= typeof catalogueErrorMessage !== 'undefined' && catalogueErrorMessage
+            ? 'Product details are temporarily unavailable.'
+            : 'No eligible Pomi Products are currently listed.' %></p>
+        <% } else { %>
+          <div class="shop-product-grid">
+            <% products.forEach(product => { %>
+              <%- include('partials/shopProductCard', { product, csrfToken, session, returnTo }) %>
+            <% }); %>
+          </div>
+        <% } %>
+      </section>
+
+      <div class="shop-divider" role="separator"></div>
+      <section class="shop-section shop-brand-section" aria-labelledby="trusted-brands-title">
+        <% // Add verified, permitted local logo paths here, including their actual file extensions.
+        const brandLogoPaths = Object.create(null);
+        const storeLogoPaths = Object.create(null); %>
+        <div class="shop-section-heading">
+          <div>
+            <p class="shop-eyebrow">Editorial brand browsing</p>
+            <h2 id="trusted-brands-title">Trusted Brands</h2>
+            <p>Explore products from familiar pet brands.</p>
+          </div>
+        </div>
+        <% [
+          { key: 'cats_dogs', title: 'Cats & Dogs Trusted Brands' },
+          { key: 'small_furries', title: 'Small Furries Trusted Brands' }
+        ].forEach(group => { %>
+          <section class="shop-brand-group" aria-labelledby="brand-group-<%= group.key %>">
+            <h3 id="brand-group-<%= group.key %>"><%= group.title %></h3>
+            <div class="shop-brand-grid">
+              <% trustedBrands.filter(brand => brand.storefront_group === group.key).forEach(brand => { %>
+                <a class="shop-brand-logo-link" href="/shop/brands/<%= encodeURIComponent(brand.brand_code) %>" aria-label="<%= brand.brand_name %> products">
+                  <% if (brandLogoPaths[brand.brand_code]) { %>
+                    <img src="<%= brandLogoPaths[brand.brand_code] %>" alt="" loading="lazy" data-logo-image hidden>
+                  <% } %>
+                  <span class="shop-logo-fallback" data-logo-fallback><%= brand.brand_name %></span>
+                </a>
+              <% }); %>
+            </div>
+          </section>
+        <% }); %>
+      </section>
+
+      <div class="shop-divider" role="separator"></div>
+      <section class="shop-section shop-alternative-shops" aria-labelledby="alternative-shops-title">
+        <div class="shop-section-heading">
+          <div>
+            <p class="shop-eyebrow">More places to explore</p>
+            <h2 id="alternative-shops-title">Alternative Pet Shops</h2>
+          </div>
+        </div>
+        <div class="shop-alternative-grid">
+          <% [
+            { name: 'CatSmart', slug: 'catsmart', url: 'https://catsmart.com.sg/' },
+            { name: 'Pet Lovers Centre', slug: 'pet-lovers-centre', url: 'https://www.petloverscentre.com/' },
+            { name: 'Polypet', slug: 'polypet', url: 'https://polypet.com.sg/' }
+          ].forEach(store => { %>
+            <a class="shop-store-logo-link" href="<%= store.url %>" target="_blank" rel="noopener noreferrer" aria-label="Visit <%= store.name %> official website (opens in a new tab)">
+                <% if (storeLogoPaths[store.slug]) { %>
+                  <img src="<%= storeLogoPaths[store.slug] %>" alt="" loading="lazy" data-logo-image hidden>
+                <% } %>
+                <span class="shop-logo-fallback" data-logo-fallback><%= store.name %></span>
+              </a>
+          <% }); %>
+        </div>
+      </section>
+      <footer class="shop-footer-note">Every Pomi listing is subject to internal eligibility and safety checks. Brand and store names are presented for navigation only.</footer>
+    <% } %>
+  </main>
+</body>
+</html>

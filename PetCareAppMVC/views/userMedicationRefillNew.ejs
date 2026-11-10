@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#102A43">
+  <title>Request Medication Refill | Pomi</title>
+  <link href="/css/user-medical-records.css" rel="stylesheet">
+</head>
+<body class="medical-page">
+  <%- include('partials/navbar') %>
+  <main class="medical-shell">
+    <a class="medical-back-link" href="/pets/<%= encodeURIComponent(pet.id) %>/medical-records?category=medication_history">← Back to Medication History</a>
+    <header class="medical-page-heading">
+      <p class="medical-eyebrow">School demonstration · CA1</p>
+      <h1>Request Refill</h1>
+      <p>This simulated request is not a prescription, veterinary authorisation, or request to supply medication.</p>
+    </header>
+
+    <% if (errorMessage) { %><div class="medical-alert" role="alert"><%= errorMessage %></div><% } %>
+    <section class="detail-card" aria-labelledby="request-medication-title">
+      <h2 id="request-medication-title">Selected pet and medication</h2>
+      <dl class="detail-fields">
+        <div><dt>Pet</dt><dd><%= pet.name %></dd></div>
+        <div><dt>Medication</dt><dd><%= medication.medication_name %></dd></div>
+        <% if (medication.dosage) { %><div><dt>Documented dosage</dt><dd><%= medication.dosage %></dd></div><% } %>
+        <% if (medication.frequency) { %><div><dt>Documented frequency</dt><dd><%= medication.frequency %></dd></div><% } %>
+        <div class="detail-field-wide"><dt>Linked medical record</dt><dd><%= medication.record_title %> · <%= medication.source_name %></dd></div>
+      </dl>
+    </section>
+
+    <% if (activeRequest) { %>
+      <section class="detail-card">
+        <h2>Request already in progress</h2>
+        <p>An active request for this medication is currently <strong><%= activeRequest.status %></strong>.</p>
+        <a class="medical-button medical-button-secondary" href="/pets/<%= encodeURIComponent(pet.id) %>/medical-records/refill-requests">View My Refill Requests</a>
+      </section>
+    <% } else { %>
+      <section class="detail-card">
+        <form method="post" action="/pets/<%= encodeURIComponent(pet.id) %>/medical-records/<%= encodeURIComponent(medication.medical_record_id) %>/refill-requests/<%= encodeURIComponent(medication.id) %>/new">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+          <input type="hidden" name="request_key" value="<%= requestKey %>">
+          <label for="refill-message">Optional message</label>
+          <textarea id="refill-message" name="message" maxlength="500" rows="4"><%= message %></textarea>
+          <p class="medical-note">The request will be recorded as Pending. Payment is Coming in CA2; this page has no Pay button.</p>
+          <button class="medical-button medical-button-primary" type="submit">Submit Demonstration Request</button>
+        </form>
+      </section>
+    <% } %>
+  </main>
+</body>
+</html>

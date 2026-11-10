@@ -1,0 +1,1097 @@
+:root {
+  --pethub-page: #F6F8FC;
+  --pethub-border: #E5E7EB;
+  --pethub-soft-blue: #F6F8FC;
+  --pethub-accent: #102A43;
+  --pethub-navy: #102A43;
+  --pethub-white: #FFFFFF;
+  --pethub-muted: #6B7280;
+  --pethub-shadow: 0 16px 42px rgb(16 42 67 / 10%);
+}
+
+.registration-page {
+  min-height: 100vh;
+  background: var(--pethub-page);
+  color: var(--pethub-navy);
+  color-scheme: light;
+  font-family: "DM Sans", sans-serif;
+}
+
+.pethub-page {
+  min-height: 100vh;
+  background: var(--pethub-page);
+  color: var(--pethub-navy);
+  font-family: "DM Sans", sans-serif;
+}
+
+.pethub-content {
+  width: min(940px, calc(100% - 40px));
+  margin: 0 auto;
+  padding: 48px 0;
+}
+
+.profile-back-link {
+  display: inline-flex;
+  margin-bottom: 18px;
+  color: var(--pethub-navy);
+  font-weight: 650;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+
+.profile-card {
+  display: grid;
+  grid-template-columns: minmax(180px, 280px) 1fr;
+  gap: 30px;
+  align-items: center;
+  padding: clamp(22px, 5vw, 42px);
+  border: 1px solid var(--pethub-border);
+  border-radius: 18px;
+  background: var(--pethub-white);
+  box-shadow: var(--pethub-shadow);
+}
+
+.profile-photo {
+  display: block;
+  width: 100%;
+  max-height: 260px;
+  aspect-ratio: 1;
+  border-radius: 13px;
+  object-fit: cover;
+}
+
+.profile-photo-placeholder {
+  display: grid;
+  place-items: center;
+  background: #F6F8FC;
+}
+
+.profile-photo-placeholder .step-paw {
+  width: 72px;
+  height: 72px;
+  color: var(--pethub-accent);
+}
+
+.profile-details h1 {
+  margin: 0 0 22px;
+  color: var(--pethub-navy);
+  font-size: clamp(1.8rem, 4vw, 2.4rem);
+}
+
+.profile-details dl {
+  display: grid;
+  gap: 13px;
+  margin: 0;
+}
+
+.profile-details dl > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--pethub-border);
+}
+
+.profile-details dt {
+  color: var(--pethub-muted);
+}
+
+.profile-details dd {
+  margin: 0;
+  color: var(--pethub-navy);
+  font-weight: 650;
+  text-align: right;
+}
+
+.profile-note {
+  margin-top: 20px;
+  color: var(--pethub-muted);
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+.pethub-home {
+  padding-top: 56px;
+  padding-bottom: 56px;
+}
+
+.pethub-home h1 {
+  color: var(--pethub-navy);
+  font-weight: 700;
+}
+
+.pethub-home .lead {
+  color: var(--pethub-muted);
+}
+
+.portal-navbar {
+  position: relative;
+  z-index: 5;
+  width: 100%;
+  background: var(--pethub-navy);
+  color: var(--pethub-white);
+  box-shadow: 0 4px 18px rgb(16 42 67 / 0.13);
+}
+
+.portal-navbar-inner {
+  width: min(1160px, calc(100% - 48px));
+  min-height: 76px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.portal-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--pethub-white);
+  text-decoration: none;
+}
+
+.portal-brand:hover {
+  color: var(--pethub-white);
+}
+
+.portal-brand-mark {
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgb(229 231 235 / 0.28);
+  border-radius: 11px;
+  background: rgb(246 248 252 / 0.14);
+}
+
+.portal-brand-mark > span {
+  color: var(--pethub-page);
+  font-size: 1.28rem;
+  font-weight: 750;
+  letter-spacing: -0.07em;
+}
+
+.portal-brand-copy {
+  display: grid;
+  gap: 3px;
+}
+
+.portal-brand-copy strong {
+  font-size: 1.1rem;
+  letter-spacing: 0.015em;
+}
+
+.portal-brand-copy > span {
+  color: #6B7280;
+  font-size: 0.72rem;
+}
+
+.portal-navigation {
+  margin-left: auto;
+}
+
+.portal-navigation ul {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.portal-navigation > ul > li > a {
+  display: inline-flex;
+  min-height: 42px;
+  align-items: center;
+  padding: 9px 12px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  color: #6B7280;
+  font-size: 0.92rem;
+  text-decoration: none;
+}
+
+.portal-navigation > ul > li > a:hover,
+.portal-navigation > ul > li > a:focus-visible {
+  background: rgb(246 248 252 / 0.18);
+  color: var(--pethub-white);
+}
+
+.portal-navigation > ul > li > a.is-active {
+  border-bottom-color: var(--pethub-soft-blue);
+  border-radius: 8px 8px 3px 3px;
+  color: var(--pethub-white);
+}
+
+.portal-navigation > ul > li > a.nav-signup {
+  border-color: rgb(229 231 235 / 0.45);
+}
+
+.account-menu {
+  position: relative;
+  margin-left: 8px;
+}
+
+.account-menu details > summary {
+  display: flex;
+  min-height: 44px;
+  align-items: center;
+  gap: 9px;
+  padding: 5px 9px;
+  border: 1px solid rgb(229 231 235 / 0.25);
+  border-radius: 9px;
+  color: var(--pethub-white);
+  cursor: pointer;
+  list-style: none;
+}
+
+.account-menu details > summary::-webkit-details-marker {
+  display: none;
+}
+
+.account-menu details > summary:focus-visible {
+  outline: 3px solid var(--pethub-soft-blue);
+  outline-offset: 3px;
+}
+
+.account-avatar {
+  display: grid;
+  width: 30px;
+  height: 30px;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--pethub-soft-blue);
+  color: var(--pethub-navy);
+  font-size: 0.83rem;
+  font-weight: 750;
+}
+
+.account-name {
+  max-width: 145px;
+  overflow: hidden;
+  font-size: 0.9rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.account-chevron {
+  width: 14px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.8;
+  transition: transform 140ms ease;
+}
+
+.account-menu details[open] .account-chevron {
+  transform: rotate(180deg);
+}
+
+.account-dropdown {
+  position: absolute;
+  z-index: 10;
+  top: calc(100% + 9px);
+  right: 0;
+  display: grid;
+  min-width: 220px;
+  gap: 5px;
+  padding: 16px;
+  border: 1px solid var(--pethub-border);
+  border-radius: 11px;
+  background: var(--pethub-white);
+  box-shadow: var(--pethub-shadow);
+  color: var(--pethub-navy);
+}
+
+.account-dropdown-label,
+.account-role {
+  color: var(--pethub-muted);
+  font-size: 0.8rem;
+}
+
+.account-dropdown strong {
+  overflow-wrap: anywhere;
+}
+
+.portal-navigation .account-dropdown .account-logout {
+  display: flex;
+  width: 100%;
+  min-height: 38px;
+  justify-content: center;
+  margin-top: 8px;
+  border-radius: 7px;
+  background: #F6F8FC;
+  color: var(--pethub-navy);
+  font-weight: 700;
+  border: 0;
+  cursor: pointer;
+}
+
+.portal-navigation .account-dropdown form {
+  width: 100%;
+}
+
+.portal-navigation .account-dropdown .account-logout:hover {
+  background: #F6F8FC;
+  color: var(--pethub-navy);
+}
+
+.portal-nav-toggle {
+  display: none;
+  width: 44px;
+  height: 44px;
+  padding: 10px;
+  border: 1px solid rgb(229 231 235 / 0.45);
+  border-radius: 8px;
+  background: transparent;
+  cursor: pointer;
+}
+
+.portal-nav-toggle span:not(.visually-hidden) {
+  display: block;
+  height: 2px;
+  margin: 4px 0;
+  background: var(--pethub-white);
+}
+
+.registration-shell {
+  width: min(1000px, calc(100% - 40px));
+  margin: 0 auto;
+  padding: 52px 0 26px;
+}
+
+.registration-intro {
+  max-width: 700px;
+  margin: 0 auto 30px;
+  text-align: center;
+}
+
+.eyebrow {
+  margin: 0 0 9px;
+  color: var(--pethub-navy);
+  font-size: 0.76rem;
+  font-weight: 750;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+}
+
+.registration-intro h1,
+.completion-card h1 {
+  margin: 0;
+  color: var(--pethub-navy);
+  font-size: clamp(2rem, 4vw, 2.65rem);
+  font-weight: 700;
+  letter-spacing: -0.035em;
+}
+
+.registration-intro > p:last-child {
+  max-width: 620px;
+  margin: 13px auto 0;
+  color: var(--pethub-muted);
+  font-size: 1.05rem;
+  line-height: 1.65;
+}
+
+.step-progress {
+  margin: 0 0 24px;
+  overflow-x: auto;
+}
+
+.step-progress ol {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin: 0;
+  padding: 0 0 2px;
+  list-style: none;
+}
+
+.step-progress ol::before {
+  position: absolute;
+  z-index: 0;
+  top: 20px;
+  right: calc(10% + 21px);
+  left: calc(10% + 21px);
+  height: 2px;
+  background: var(--pethub-border);
+  content: "";
+}
+
+.step-progress li {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  width: 20%;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  color: var(--pethub-muted);
+  font-size: 0.78rem;
+  text-align: center;
+}
+
+.step-marker {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  border: 2px solid var(--pethub-border);
+  border-radius: 50%;
+  background: var(--pethub-white);
+  color: #6B7280;
+}
+
+.step-paw {
+  width: 23px;
+  height: 23px;
+  fill: currentColor;
+}
+
+.step-progress li.is-complete .step-marker {
+  border-color: var(--pethub-accent);
+  background: var(--pethub-accent);
+  color: var(--pethub-white);
+}
+
+.step-progress li.is-current .step-marker {
+  border-color: var(--pethub-navy);
+  background: var(--pethub-navy);
+  color: var(--pethub-white);
+  box-shadow: 0 0 0 4px rgb(16 42 67 / 0.28);
+}
+
+.step-progress li.is-current {
+  color: var(--pethub-navy);
+  font-weight: 700;
+}
+
+.wizard-panel,
+.completion-card {
+  padding: clamp(24px, 5vw, 48px);
+  border: 1px solid var(--pethub-border);
+  border-radius: 18px;
+  background: var(--pethub-white);
+  box-shadow: var(--pethub-shadow);
+}
+
+.wizard-panel[hidden] {
+  display: none;
+}
+
+.wizard-panel h2 {
+  margin: 0 0 12px;
+  color: var(--pethub-navy);
+  font-size: clamp(1.55rem, 3vw, 2rem);
+  font-weight: 700;
+  letter-spacing: -0.025em;
+}
+
+.wizard-panel h2:focus {
+  outline: none;
+}
+
+.wizard-panel .eyebrow {
+  color: #102A43;
+}
+
+.panel-lead {
+  max-width: 720px;
+  margin: 0 0 26px;
+  color: var(--pethub-muted);
+  font-size: 1rem;
+  line-height: 1.65;
+}
+
+.panel-icon {
+  width: 58px;
+  height: 58px;
+  display: grid;
+  place-items: center;
+  margin-bottom: 22px;
+  border-radius: 16px;
+  background: #F6F8FC;
+}
+
+.panel-icon svg {
+  width: 36px;
+  fill: none;
+  stroke: var(--pethub-navy);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2;
+}
+
+.information-panel {
+  padding: 18px 20px;
+  border: 1px solid #E5E7EB;
+  border-left: 4px solid var(--pethub-accent);
+  border-radius: 10px;
+  background: #F6F8FC;
+  color: var(--pethub-navy);
+  line-height: 1.6;
+}
+
+.information-panel strong {
+  display: block;
+  margin-bottom: 7px;
+  font-size: 0.95rem;
+}
+
+.information-panel p,
+.information-panel ul {
+  margin: 0;
+  color: #102A43;
+  font-size: 0.92rem;
+}
+
+.information-panel ul {
+  display: grid;
+  gap: 5px;
+  padding-left: 20px;
+}
+
+.field-group {
+  display: grid;
+  gap: 8px;
+  margin: 0 0 22px;
+}
+
+.field-group label {
+  color: var(--pethub-navy);
+  font-size: 0.95rem;
+  font-weight: 650;
+}
+
+.required-mark,
+.optional-mark {
+  margin-left: 7px;
+  color: #102A43;
+  font-size: 0.74rem;
+  font-weight: 650;
+}
+
+.optional-mark {
+  color: var(--pethub-muted);
+}
+
+.registration-page .form-control {
+  min-height: 50px;
+  border: 1px solid #E5E7EB;
+  border-radius: 10px;
+  background-color: var(--pethub-white);
+  color: #102A43;
+  font-size: 1rem;
+}
+
+.registration-page .form-control:focus {
+  border-color: var(--pethub-navy);
+  outline: 3px solid rgb(107 114 128 / 0.35);
+  box-shadow: none;
+}
+
+.registration-page .file-input {
+  height: auto;
+  padding: 10px 12px;
+}
+
+.field-hint {
+  color: var(--pethub-muted);
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+
+.details-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(250px, 0.75fr);
+  gap: 30px;
+  align-items: start;
+}
+
+.pet-summary {
+  position: sticky;
+  top: 20px;
+  padding: 20px;
+  border: 1px solid var(--pethub-border);
+  border-radius: 12px;
+  background: #F6F8FC;
+}
+
+.summary-heading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--pethub-border);
+}
+
+.summary-heading h3 {
+  margin: 0;
+  color: var(--pethub-navy);
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.summary-avatar {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  flex: 0 0 42px;
+  place-items: center;
+  border-radius: 12px;
+  background: #F6F8FC;
+}
+
+.summary-avatar svg {
+  width: 25px;
+  fill: var(--pethub-accent);
+}
+
+.pet-summary dl {
+  display: grid;
+  gap: 12px;
+  margin: 17px 0 0;
+}
+
+.pet-summary dl > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 15px;
+}
+
+.pet-summary dt {
+  color: var(--pethub-muted);
+  font-size: 0.84rem;
+  font-weight: 500;
+}
+
+.pet-summary dd {
+  max-width: 62%;
+  margin: 0;
+  overflow-wrap: anywhere;
+  color: var(--pethub-navy);
+  font-size: 0.84rem;
+  font-weight: 650;
+  text-align: right;
+}
+
+.confirmation-strip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  margin: 0 0 24px;
+  padding: 14px 17px;
+  border: 1px solid var(--pethub-border);
+  border-radius: 10px;
+  background: #F6F8FC;
+}
+
+.confirmation-label {
+  color: var(--pethub-muted);
+  font-size: 0.88rem;
+}
+
+.confirmation-strip strong {
+  overflow-wrap: anywhere;
+  color: var(--pethub-navy);
+  font-size: 0.95rem;
+}
+
+.privacy-panel {
+  margin: 5px 0 26px;
+}
+
+.wizard-actions,
+.completion-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 30px;
+  padding-top: 22px;
+  border-top: 1px solid #E5E7EB;
+}
+
+.wizard-actions-end {
+  justify-content: flex-end;
+}
+
+.registration-page .button {
+  display: inline-flex;
+  min-height: 48px;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 11px 20px;
+  border: 2px solid transparent;
+  border-radius: 9px;
+  font: inherit;
+  font-size: 0.94rem;
+  font-weight: 700;
+  line-height: 1.2;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 140ms ease, border-color 140ms ease, transform 140ms ease;
+}
+
+.pethub-page .button,
+.pethub-home .button {
+  display: inline-flex;
+  min-height: 48px;
+  align-items: center;
+  justify-content: center;
+  padding: 11px 20px;
+  border: 2px solid var(--pethub-navy);
+  border-radius: 9px;
+  background: var(--pethub-navy);
+  color: var(--pethub-white);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.pethub-page .button:focus-visible,
+.pethub-home .button:focus-visible,
+.profile-back-link:focus-visible {
+  outline: 3px solid var(--pethub-accent);
+  outline-offset: 3px;
+}
+
+.registration-page .button:hover {
+  transform: translateY(-1px);
+}
+
+.registration-page .button:focus-visible,
+.portal-navbar a:focus-visible,
+.portal-nav-toggle:focus-visible {
+  outline: 3px solid var(--pethub-accent);
+  outline-offset: 3px;
+}
+
+.registration-page .button-primary {
+  border-color: var(--pethub-navy);
+  background: var(--pethub-navy);
+  color: var(--pethub-white);
+}
+
+.registration-page .button-primary:hover {
+  border-color: #E5E7EB;
+  background: #102A43;
+  color: var(--pethub-white);
+}
+
+.registration-page .button-secondary {
+  border-color: #E5E7EB;
+  background: var(--pethub-white);
+  color: var(--pethub-navy);
+}
+
+.registration-page .button-secondary:hover {
+  border-color: var(--pethub-navy);
+  background: #F6F8FC;
+  color: var(--pethub-navy);
+}
+
+.registration-alert {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 8px 12px;
+  margin: 0 0 20px;
+  padding: 15px 18px;
+  border: 1px solid;
+  border-radius: 10px;
+  font-size: 0.93rem;
+  line-height: 1.5;
+}
+
+.registration-alert.alert-danger {
+  border-color: #E5E7EB;
+  background: #F6F8FC;
+  color: #102A43;
+}
+
+.registration-alert.alert-success {
+  border-color: #E5E7EB;
+  background: #F6F8FC;
+  color: #102A43;
+}
+
+.alert-icon {
+  display: grid;
+  width: 23px;
+  height: 23px;
+  place-items: center;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  font-weight: 750;
+}
+
+.alert-hint {
+  grid-column: 2;
+  color: inherit;
+  font-size: 0.84rem;
+}
+
+.completion-card {
+  max-width: 760px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.completion-mark {
+  display: grid;
+  width: 72px;
+  height: 72px;
+  place-items: center;
+  margin: 0 auto 22px;
+  border: 1px solid #E5E7EB;
+  border-radius: 50%;
+  background: #F6F8FC;
+}
+
+.completion-mark svg {
+  width: 39px;
+  fill: none;
+  stroke: #102A43;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 3;
+}
+
+.completion-card h1 {
+  font-size: clamp(1.8rem, 4vw, 2.4rem);
+}
+
+.completion-lead {
+  margin: 15px 0 0;
+  color: var(--pethub-muted);
+  font-size: 1.04rem;
+  line-height: 1.6;
+}
+
+.completion-lead strong {
+  color: var(--pethub-navy);
+}
+
+.completion-actions {
+  justify-content: center;
+  border-top: 0;
+  margin-top: 24px;
+  padding-top: 0;
+}
+
+.completion-note {
+  margin: 18px 0 0;
+  padding: 13px 15px;
+  border-radius: 9px;
+  background: #F6F8FC;
+  color: #102A43;
+  font-size: 0.87rem;
+  line-height: 1.55;
+}
+
+.registration-footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 25px 3px 0;
+  color: var(--pethub-muted);
+  font-size: 0.78rem;
+}
+
+@media (max-width: 760px) {
+  .portal-navbar-inner {
+    width: min(100% - 32px, 1160px);
+    min-height: 72px;
+    gap: 0 12px;
+  }
+
+  .portal-nav-toggle {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    margin-left: auto;
+  }
+
+  .portal-navigation {
+    position: absolute;
+    z-index: 8;
+    top: calc(100% + 8px);
+    right: 16px;
+    display: none;
+    width: min(310px, calc(100vw - 32px));
+    padding: 10px;
+    border: 1px solid rgb(229 231 235 / 0.9);
+    border-radius: 12px;
+    background: var(--pethub-navy);
+    box-shadow: 0 14px 30px rgb(16 42 67 / 0.24);
+  }
+
+  .portal-navigation.is-open {
+    display: block;
+  }
+
+  .portal-navigation ul {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .portal-navigation > ul > li > a {
+    width: 100%;
+  }
+
+  .portal-navigation > ul > li > a.is-active {
+    border-color: rgb(229 231 235 / 0.32);
+    background: rgb(246 248 252 / 0.15);
+  }
+
+  .account-menu {
+    margin: 3px 0 0;
+    padding-top: 8px;
+    border-top: 1px solid rgb(229 231 235 / 0.2);
+  }
+
+  .account-menu details > summary {
+    width: 100%;
+  }
+
+  .account-dropdown {
+    position: static;
+    margin-top: 8px;
+  }
+
+  .registration-shell {
+    width: min(100% - 28px, 1000px);
+    padding-top: 36px;
+  }
+
+  .pethub-content {
+    width: min(100% - 28px, 940px);
+    padding-top: 34px;
+  }
+
+  .profile-card {
+    grid-template-columns: 1fr;
+    gap: 22px;
+  }
+
+  .profile-photo {
+    width: min(100%, 300px);
+    margin: 0 auto;
+  }
+
+  .details-layout {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .pet-summary {
+    position: static;
+  }
+}
+
+@media (max-width: 520px) {
+  .portal-navbar-inner {
+    width: calc(100% - 24px);
+  }
+
+  .portal-navigation {
+    right: 12px;
+  }
+
+  .portal-brand-copy strong {
+    font-size: 1rem;
+  }
+
+  .portal-brand-copy > span {
+    max-width: 220px;
+    font-size: 0.69rem;
+  }
+
+  .registration-shell {
+    width: calc(100% - 22px);
+    padding-top: 28px;
+  }
+
+  .registration-intro {
+    margin-bottom: 24px;
+  }
+
+  .registration-intro > p:last-child {
+    font-size: 0.94rem;
+  }
+
+  .step-progress {
+    margin-bottom: 17px;
+  }
+
+  .step-progress ol {
+    min-width: 460px;
+  }
+
+  .step-progress li {
+    font-size: 0.7rem;
+  }
+
+  .step-progress ol::before {
+    right: calc(10% + 20px);
+    left: calc(10% + 20px);
+    top: 19px;
+  }
+
+  .step-marker {
+    width: 40px;
+    height: 40px;
+  }
+
+  .step-paw {
+    width: 21px;
+    height: 21px;
+  }
+
+  .wizard-panel,
+  .completion-card {
+    padding: 22px 18px;
+    border-radius: 14px;
+  }
+
+  .confirmation-strip {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .wizard-actions,
+  .completion-actions {
+    flex-direction: column-reverse;
+    align-items: stretch;
+  }
+
+  .wizard-actions .button,
+  .completion-actions .button {
+    width: 100%;
+  }
+
+  .registration-footer {
+    font-size: 0.72rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .registration-page *,
+  .registration-page *::before,
+  .registration-page *::after,
+  .portal-navbar *,
+  .portal-navbar *::before,
+  .portal-navbar *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}

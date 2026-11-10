@@ -1,0 +1,920 @@
+:root {
+  color-scheme: light;
+  --font-sans: "DM Sans", sans-serif;
+  --color-white: #FFFFFF;
+  --color-page: #F6F8FC;
+  --color-border: #E5E7EB;
+  --color-sage: #6B7280;
+  --color-charcoal: #102A43;
+  --color-muted: #6B7280;
+  --color-blue: #102A43;
+  --color-blue-dark: #102A43;
+  --color-blue-soft: #F6F8FC;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 18px;
+  --shadow-card: 0 8px 26px rgb(16 42 67 / 6%);
+  --content-width: 1200px;
+  --space-1: 0.35rem;
+  --space-2: 0.65rem;
+  --space-3: 1rem;
+  --space-4: 1.5rem;
+  --space-5: 2rem;
+  --pethub-page: #F6F8FC;
+  --pethub-border: #E5E7EB;
+  --pethub-soft-blue: #F6F8FC;
+  --pethub-accent: #102A43;
+  --pethub-navy: #102A43;
+  --pethub-white: #FFFFFF;
+  --pethub-muted: #6B7280;
+  --pethub-shadow: var(--shadow-card);
+  --dashboard-page: #F6F8FC;
+  --dashboard-border: #E5E7EB;
+  --dashboard-highlight: #F6F8FC;
+  --dashboard-action: #102A43;
+  --dashboard-navy: #102A43;
+  --dashboard-muted: #6B7280;
+  --dashboard-white: #FFFFFF;
+  --dashboard-shadow: var(--shadow-card);
+  --medical-ink: #102A43;
+  --medical-muted: #6B7280;
+  --medical-border: #E5E7EB;
+  --medical-surface: #FFFFFF;
+  --medical-background: #F6F8FC;
+  --medical-accent: #102A43;
+  --medical-accent-dark: #102A43;
+  --medical-soft: #F6F8FC;
+  --medical-bg: #F6F8FC;
+  --medical-highlight: #F6F8FC;
+  --medical-primary: #102A43;
+  --medical-heading: #102A43;
+  --medical-text: #102A43;
+  --shop-ivory: #F6F8FC;
+  --shop-paper: #FFFFFF;
+  --shop-sand: #F6F8FC;
+  --shop-peach: #F6F8FC;
+  --shop-sage: #6B7280;
+  --shop-charcoal: #102A43;
+  --shop-muted: #6B7280;
+  --shop-blue: #102A43;
+  --shop-line: #E5E7EB;
+  --shop-shadow: var(--shadow-card);
+  --veterinary-accent: #102A43;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  background: var(--color-page);
+  scroll-behavior: smooth;
+}
+
+body,
+body.shop-page,
+body.dashboard-page,
+body.registration-page,
+body.pethub-page,
+body.medical-page,
+body.medical-records-page,
+body.veterinary-directory-page {
+  min-height: 100vh;
+  margin: 0;
+  background-color: var(--color-page);
+  color: var(--color-charcoal);
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 1.55;
+}
+
+body *,
+body *::before,
+body *::after {
+  font-family: var(--font-sans) !important;
+}
+
+body.dashboard-page::before,
+body.dashboard-page::after {
+  display: none;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  color: var(--color-charcoal);
+  font-weight: 600;
+  letter-spacing: -0.035em;
+  line-height: 1.22;
+  overflow-wrap: anywhere;
+}
+
+h1 {
+  font-size: clamp(1.8rem, 3vw, 2.45rem);
+}
+
+h2 {
+  font-size: clamp(1.35rem, 2.1vw, 1.75rem);
+}
+
+h3 {
+  font-size: 1.12rem;
+}
+
+p,
+dd,
+dt,
+label,
+small {
+  overflow-wrap: anywhere;
+}
+
+a {
+  color: var(--color-blue-dark);
+  text-underline-offset: 3px;
+}
+
+a:hover {
+  color: var(--color-blue);
+}
+
+:focus-visible {
+  outline: 3px solid #6B7280;
+  outline-offset: 3px;
+}
+
+.portal-navbar,
+body .portal-navbar {
+  position: relative;
+  z-index: 20;
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-white);
+  box-shadow: 0 3px 14px rgb(16 42 67 / 4%);
+  color: var(--color-charcoal);
+}
+
+.portal-navbar-inner,
+body .portal-navbar-inner {
+  width: min(var(--content-width), calc(100% - 48px));
+  min-height: 68px;
+  gap: 20px;
+}
+
+.portal-brand,
+.portal-brand:hover {
+  color: var(--color-charcoal);
+}
+
+.portal-brand-mark,
+.portal-brand-mark > span {
+  border-color: var(--color-border);
+  background: var(--color-blue-soft);
+  color: var(--color-blue-dark);
+}
+
+.portal-brand-mark > img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.portal-brand-copy strong {
+  color: var(--color-charcoal);
+  font-size: 1.08rem;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+}
+
+.portal-brand-copy > span {
+  color: var(--color-muted);
+  font-size: 0.74rem;
+}
+
+.portal-navigation > ul > li > a,
+.account-menu details > summary {
+  color: var(--color-charcoal);
+}
+
+.portal-navigation > ul > li > a {
+  border-radius: var(--radius-sm);
+  font-size: 0.88rem;
+}
+
+.portal-navigation > ul > li > a:hover,
+.portal-navigation > ul > li > a:focus-visible,
+.portal-navigation > ul > li > a.is-active {
+  border-bottom-color: transparent;
+  background: #F6F8FC;
+  color: var(--color-blue-dark);
+}
+
+.portal-navigation > ul > li > a.nav-signup,
+.portal-navigation > ul > li > a.nav-signup:hover,
+.portal-navigation > ul > li > a.nav-signup:focus-visible {
+  border: 1px solid var(--color-blue);
+  background: var(--color-blue);
+  color: var(--color-white);
+}
+
+.portal-nav-toggle {
+  border-color: var(--color-border);
+}
+
+.portal-nav-toggle span:not(.visually-hidden) {
+  background: var(--color-charcoal);
+}
+
+.account-avatar {
+  background: var(--color-blue-soft);
+  color: var(--color-blue-dark);
+}
+
+.account-dropdown {
+  border-color: var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-white);
+  box-shadow: var(--shadow-card);
+  color: var(--color-charcoal);
+}
+
+.portal-navigation .account-dropdown .account-logout {
+  background: var(--color-page);
+  color: var(--color-blue-dark);
+}
+
+.portal-navigation .account-dropdown .account-logout:hover {
+  background: var(--color-border);
+}
+
+main,
+.container,
+.dashboard-shell,
+.medical-shell,
+.medical-records-shell,
+.veterinary-directory-shell,
+.shop-shell,
+.shop-admin-shell {
+  min-width: 0;
+}
+
+.container {
+  max-width: var(--content-width);
+}
+
+.dashboard-shell {
+  width: min(var(--content-width), calc(100% - 48px));
+  padding-top: clamp(24px, 4vw, 42px);
+  padding-bottom: 52px;
+}
+
+.dashboard-hero {
+  display: flex;
+  height: auto;
+  min-height: 300px;
+  align-items: center;
+  border-color: var(--color-border);
+  border-radius: var(--radius-lg);
+  background-color: var(--color-white);
+  background-image: linear-gradient(90deg, rgb(246 248 252 / 88%) 0%, rgb(246 248 252 / 72%) 46%, rgb(246 248 252 / 10%) 100%), url("/images/pethub-pets-hero.png");
+  background-position: center, right 42%;
+  background-size: cover;
+  box-shadow: var(--shadow-card);
+}
+
+.dashboard-hero-copy {
+  max-width: 650px;
+  padding: clamp(24px, 4vw, 42px);
+}
+
+.dashboard-hero h1 {
+  max-width: 540px;
+  font-size: clamp(1.9rem, 3.5vw, 2.75rem);
+  letter-spacing: -0.04em;
+  line-height: 1.15;
+}
+
+.dashboard-hero-description {
+  max-width: 480px;
+  margin: 14px 0 0;
+  font-size: 0.95rem;
+  line-height: 1.65;
+}
+
+.passport-section {
+  margin-top: 42px;
+}
+
+.section-heading {
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.section-heading h2 {
+  font-size: clamp(1.45rem, 2.5vw, 1.9rem);
+}
+
+.passport-list {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 410px), 1fr));
+  gap: 14px;
+}
+
+.passport-card,
+.dashboard-appointment-card,
+.dashboard-shop-card,
+.passport-empty-state,
+.dashboard-shop-history,
+.medical-page-heading,
+.medical-panel,
+.record-card,
+.detail-card,
+.medical-empty-state,
+.profile-card,
+.category-card,
+.veterinary-filters,
+.veterinary-category-section,
+.veterinary-clinic-card,
+.shop-admin-panel,
+.shop-product-card,
+.product-card,
+.appointment-card {
+  border-color: var(--color-border);
+  border-radius: var(--radius-md);
+  background-color: var(--color-white);
+  box-shadow: var(--shadow-card);
+}
+
+.passport-card {
+  border-radius: var(--radius-md);
+  box-shadow: none;
+}
+
+.passport-details {
+  padding: 18px;
+}
+
+.passport-photo,
+.passport-photo-fallback {
+  min-height: 220px;
+}
+
+.passport-photo > img {
+  min-height: 220px;
+}
+
+.passport-count,
+.roadmap-label,
+.passport-status {
+  border-color: var(--color-border);
+  background: #F6F8FC;
+  color: var(--color-charcoal);
+}
+
+.dashboard-button,
+.dashboard-appointment-button,
+.medical-button,
+.veterinary-directions-link,
+.veterinary-source-link,
+.shop-button,
+.btn {
+  min-height: 40px;
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+  font-weight: 600;
+  line-height: 1.3;
+  white-space: normal;
+}
+
+.dashboard-button {
+  padding: 9px 15px;
+}
+
+.dashboard-button-primary,
+.dashboard-appointment-button-primary,
+.medical-primary-button,
+.btn-primary {
+  border-color: var(--color-blue);
+  background: var(--color-blue);
+  color: var(--color-white);
+}
+
+.dashboard-button-primary:hover,
+.dashboard-appointment-button-primary:hover,
+.medical-primary-button:hover,
+.btn-primary:hover,
+.btn-primary:focus-visible {
+  border-color: var(--color-blue-dark);
+  background: var(--color-blue-dark);
+  color: var(--color-white);
+}
+
+.btn-outline-primary,
+.medical-secondary-button {
+  border-color: var(--color-blue);
+  color: var(--color-blue-dark);
+}
+
+.btn-outline-primary:hover,
+.btn-outline-primary:focus-visible {
+  border-color: var(--color-blue);
+  background: var(--color-blue);
+  color: var(--color-white);
+}
+
+.form-control,
+.form-select,
+textarea,
+input,
+select {
+  min-width: 0;
+  border-color: #E5E7EB;
+  border-radius: var(--radius-sm);
+  background-color: var(--color-white);
+  color: var(--color-charcoal);
+  font-size: 0.94rem;
+}
+
+.form-control,
+.form-select {
+  min-height: 42px;
+  padding: 0.55rem 0.75rem;
+}
+
+.form-control:focus,
+.form-select:focus,
+textarea:focus,
+input:focus,
+select:focus {
+  border-color: var(--color-blue);
+  box-shadow: 0 0 0 0.2rem rgb(16 42 67 / 16%);
+}
+
+label,
+.form-label {
+  color: var(--color-charcoal);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.table-responsive,
+.medical-table-wrap {
+  max-width: 100%;
+  overflow-x: auto;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+table {
+  color: var(--color-charcoal);
+}
+
+th {
+  color: var(--color-charcoal);
+  font-size: 0.84rem;
+  font-weight: 600;
+}
+
+td {
+  overflow-wrap: anywhere;
+  vertical-align: middle;
+}
+
+.table > :not(caption) > * > * {
+  padding: 0.7rem 0.8rem;
+  border-bottom-color: var(--color-border);
+}
+
+.table thead th,
+.medical-table thead th {
+  background: #F6F8FC;
+}
+
+.shop-page .portal-brand-copy strong,
+.shop-page h1,
+.shop-page h2,
+.shop-page h3,
+.shop-page h4,
+.shop-page h5,
+.shop-page h6,
+body:not(.shop-page) .container h1,
+body:not(.shop-page) .container h2 {
+  font-family: var(--font-sans) !important;
+}
+
+.shop-page .shop-hero,
+.shop-page .shop-banner,
+.shop-page .shop-product-card,
+.shop-page .shop-collection-card,
+.shop-page .shop-category-card,
+.shop-page .shop-brand-card,
+.shop-page .shop-cart-panel,
+.shop-page .shop-summary,
+.shop-page .shop-product-detail {
+  border-color: var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
+}
+
+.medical-page-heading {
+  margin-bottom: 22px;
+  padding: clamp(20px, 3vw, 30px);
+}
+
+.medical-categories,
+.medical-record-list {
+  margin-top: 26px;
+}
+
+.category-card {
+  min-height: 88px;
+  padding: 14px;
+  box-shadow: none;
+}
+
+.record-card,
+.detail-card,
+.medical-empty-state,
+.medical-panel {
+  padding: clamp(16px, 2vw, 22px);
+}
+
+.medical-page,
+.medical-records-page,
+.registration-page,
+.pethub-page,
+.veterinary-directory-page {
+  background: var(--color-page);
+  color: var(--color-charcoal);
+}
+
+.medical-page-heading h1,
+.medical-page-heading h2,
+.medical-page-heading h3,
+.medical-page-heading p,
+.medical-page-heading dt {
+  color: inherit;
+}
+
+.veterinary-page-heading {
+  padding: 28px 0 20px;
+}
+
+.veterinary-page-heading h1 {
+  max-width: 700px;
+  font-size: clamp(1.9rem, 3vw, 2.45rem);
+}
+
+.veterinary-filters,
+.veterinary-category-section {
+  margin-top: 18px;
+  padding: 18px;
+  box-shadow: none;
+}
+
+.veterinary-clinic-grid {
+  gap: 12px;
+}
+
+.veterinary-clinic-card {
+  padding: 16px;
+  box-shadow: none;
+}
+
+.veterinary-clinic-card h3 {
+  margin-top: 10px;
+}
+
+.veterinary-verification-note,
+.veterinary-phone-unverified {
+  border-color: var(--color-blue);
+  background: var(--color-blue-soft);
+  color: var(--color-charcoal);
+}
+
+.appointment-section {
+  margin: 18px 0;
+}
+
+.appointment-card {
+  padding: 15px 16px;
+  box-shadow: none;
+}
+
+.appointment-summary {
+  grid-template-columns: minmax(0, 1fr) minmax(140px, 0.5fr);
+}
+
+.appointment-form {
+  max-width: 760px;
+  padding: 20px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-white);
+}
+
+.appointment-form input,
+.appointment-form select,
+.appointment-form textarea {
+  padding: 10px;
+  border-color: #E5E7EB;
+  border-radius: var(--radius-sm);
+}
+
+.appointment-filters a {
+  border-color: var(--color-border);
+  border-radius: 999px;
+}
+
+.appointment-filters a.selected {
+  border-color: var(--color-blue);
+  background: var(--color-blue);
+}
+
+.pethub-home {
+  min-height: 360px;
+  padding-top: clamp(38px, 7vw, 72px);
+  padding-bottom: clamp(38px, 7vw, 72px);
+  border-radius: var(--radius-lg);
+  background-color: var(--color-page);
+  background-image: linear-gradient(90deg, rgb(246 248 252 / 86%) 0%, rgb(246 248 252 / 70%) 46%, rgb(246 248 252 / 12%) 100%), url("/images/pethub-pets-hero.png");
+  background-position: center, right center;
+  background-size: cover;
+  text-align: left !important;
+}
+
+.pethub-home h1 {
+  max-width: 580px;
+  font-size: clamp(2rem, 4vw, 2.9rem);
+}
+
+.pethub-home .lead {
+  max-width: 540px;
+  font-size: 1.05rem;
+}
+
+body > .container,
+body > main.container {
+  margin-top: clamp(24px, 4vw, 40px) !important;
+  margin-bottom: 40px;
+}
+
+body:not(.shop-page) .container .card {
+  border-color: var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
+}
+
+body:not(.shop-page) .container .card-header.bg-dark {
+  background: var(--color-charcoal) !important;
+}
+
+.medical-records-page .medical-panel,
+.medical-records-page .medication-entry-row,
+.medical-records-page .selected-pet-card,
+.medical-records-page .medical-form-notice,
+.medical-records-page .payment-coming-soon,
+.medical-records-page .medical-local-preview {
+  border-color: var(--color-border);
+  border-radius: var(--radius-md);
+  background-color: #F6F8FC;
+  color: var(--color-charcoal);
+}
+
+.medical-records-page .medical-panel {
+  background-color: var(--color-white);
+}
+
+.registration-page .pethub-content,
+.pethub-page .pethub-content {
+  width: min(920px, calc(100% - 40px));
+  padding-top: 32px;
+  padding-bottom: 42px;
+}
+
+.profile-card {
+  gap: 24px;
+  padding: clamp(18px, 3vw, 30px);
+  box-shadow: var(--shadow-card);
+}
+
+body.auth-page {
+  display: flow-root;
+  background-image: linear-gradient(90deg, rgb(246 248 252 / 86%), rgb(246 248 252 / 72%)), url("/images/pethub-pets-hero.png");
+  background-position: center, right center;
+  background-size: cover;
+  background-attachment: fixed;
+}
+
+body.auth-page > .container {
+  width: min(560px, calc(100% - 32px));
+  max-width: 560px;
+  margin: clamp(28px, 6vw, 64px) auto !important;
+  padding: clamp(22px, 4vw, 36px);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-white);
+  box-shadow: var(--shadow-card);
+}
+
+body.auth-page .container h2 {
+  margin-bottom: 20px !important;
+  font-size: clamp(1.45rem, 3vw, 1.8rem);
+}
+
+body.auth-page .container .form-control {
+  min-height: 44px;
+}
+
+.shop-page .shop-shell,
+.shop-page .shop-admin-shell {
+  width: min(var(--content-width), calc(100% - 48px));
+  margin-inline: auto;
+}
+
+.shop-page .shop-page-heading,
+.shop-page .shop-admin-heading {
+  margin-block: 24px 18px;
+}
+
+.shop-page .shop-product-grid,
+.shop-page .shop-grid,
+.shop-page .shop-collection-grid {
+  gap: 14px;
+}
+
+.shop-page .shop-product-image,
+.shop-page .shop-product-image-wrap img,
+.shop-page .shop-card-image img {
+  max-width: 100%;
+}
+
+.shop-cart-count {
+  background: var(--color-blue-soft);
+  color: var(--color-blue-dark);
+}
+
+.alert {
+  border-radius: var(--radius-sm);
+}
+
+img,
+video,
+iframe,
+canvas {
+  max-width: 100%;
+}
+
+img {
+  height: auto;
+}
+
+@media (max-width: 900px) {
+  .portal-navbar-inner,
+  body .portal-navbar-inner,
+  .dashboard-shell,
+  .shop-page .shop-shell,
+  .shop-page .shop-admin-shell {
+    width: min(100% - 32px, var(--content-width));
+  }
+
+  .dashboard-hero {
+    min-height: 270px;
+    background-image: linear-gradient(90deg, rgb(246 248 252 / 88%) 0%, rgb(246 248 252 / 66%) 58%, rgb(246 248 252 / 16%) 100%), url("/images/pethub-pets-hero.png");
+  }
+
+  .dashboard-appointments-heading,
+  .section-heading {
+    align-items: flex-start;
+  }
+}
+
+@media (max-width: 700px) {
+  body {
+    font-size: 14px;
+  }
+
+  .portal-navbar-inner,
+  body .portal-navbar-inner {
+    min-height: 62px;
+  }
+
+  .portal-brand-copy > span {
+    display: none;
+  }
+
+  .dashboard-shell {
+    padding-top: 22px;
+    padding-bottom: 36px;
+  }
+
+  .dashboard-hero {
+    min-height: 0;
+    background-image: linear-gradient(90deg, rgb(246 248 252 / 84%), rgb(246 248 252 / 62%)), url("/images/pethub-pets-hero.png");
+  }
+
+  .dashboard-hero-copy {
+    padding: 22px;
+  }
+
+  .dashboard-hero h1,
+  .pethub-home h1 {
+    font-size: clamp(1.75rem, 8vw, 2.25rem);
+  }
+
+  .passport-list,
+  .category-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .passport-card {
+    grid-template-columns: minmax(90px, 0.35fr) minmax(0, 1fr);
+  }
+
+  .passport-photo,
+  .passport-photo-fallback,
+  .passport-photo > img {
+    min-height: 170px;
+  }
+
+  .passport-details {
+    padding: 14px;
+  }
+
+  .passport-actions,
+  .dashboard-appointment-actions,
+  .appointment-actions {
+    flex-wrap: wrap;
+  }
+
+  .appointment-summary,
+  .appointment-form-row,
+  .medical-record-details,
+  .medical-pet-summary,
+  .detail-fields {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .appointment-form {
+    padding: 16px;
+  }
+
+  .pethub-home {
+    min-height: 280px;
+    padding: 32px 18px;
+    background-image: linear-gradient(90deg, rgb(246 248 252 / 84%), rgb(246 248 252 / 60%)), url("/images/pethub-pets-hero.png");
+  }
+
+  body.auth-page > .container {
+    width: calc(100% - 28px);
+    padding: 20px;
+  }
+
+  .medical-form-actions > .btn,
+  .dashboard-appointment-actions .dashboard-appointment-button,
+  .dashboard-appointment-actions form {
+    max-width: 100%;
+  }
+
+  .medical-document-preview {
+    min-height: 22rem;
+  }
+}
+
+@media (max-width: 420px) {
+  .passport-card {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .passport-photo,
+  .passport-photo-fallback,
+  .passport-photo > img {
+    max-height: 210px;
+    min-height: 180px;
+  }
+
+  .section-heading,
+  .passport-pet-heading,
+  .medical-panel-heading {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#102A43">
+  <title>Initial Admin setup | Pomi</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="/css/pomi-security.css" rel="stylesheet">
+</head>
+<body class="pomi-security-page">
+  <main class="security-shell">
+    <a class="security-brand" href="/"><img src="/images/pomi-logo.png" alt=""><strong>Pomi Admin setup</strong></a>
+    <section class="security-card" aria-labelledby="setup-title">
+      <p class="security-eyebrow">One-time provisioning</p>
+      <h1 id="setup-title"><%= disabled ? 'Setup unavailable' : 'Create the first Admin' %></h1>
+      <% if (disabled) { %>
+        <p class="security-description">Initial setup is permanently complete, or the operator has not configured the required setup token and encryption key.</p>
+      <% } else { %>
+        <p class="security-description">This private bootstrap is available only once and requires the operator-configured setup token. After creation, authenticator enrollment must be completed before Admin access is granted.</p>
+        <% if (errors && errors.length) { %><div class="security-alert" role="alert"><% errors.forEach(error => { %><p><%= error %></p><% }); %></div><% } %>
+        <form class="security-form" action="/admin/setup" method="post">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+          <div class="security-field"><label for="setup-token">One-time setup token</label><input id="setup-token" name="setup_token" type="password" autocomplete="off" required></div>
+          <div class="security-field"><label for="username">Admin username</label><input id="username" name="username" autocomplete="username" minlength="3" maxlength="50" required></div>
+          <div class="security-field"><label for="name">Name</label><input id="name" name="name" autocomplete="name" maxlength="100" required></div>
+          <div class="security-field"><label for="password">Password (at least 12 characters)</label><input id="password" name="password" type="password" autocomplete="new-password" minlength="12" maxlength="128" required></div>
+          <button class="security-button" type="submit">Create Admin and enroll authenticator</button>
+        </form>
+      <% } %>
+    </section>
+  </main>
+</body>
+</html>

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Users &amp; Pets | Pomi Admin</title>
+</head>
+<body>
+  <%- include('partials/navbar') %>
+  <main class="pomi-admin-content">
+    <header class="pomi-admin-dashboard-header">
+      <div>
+        <p class="pomi-admin-dashboard-kicker">Management</p>
+        <h1>Users &amp; pets</h1>
+        <p>Manage account details and review registered pet profiles.</p>
+      </div>
+    </header>
+    <% if (successMessage) { %>
+      <p class="pomi-admin-alert pomi-admin-alert-success" role="status"><%= successMessage %></p>
+    <% } %>
+    <% if (errorMessage) { %>
+      <p class="pomi-admin-alert pomi-admin-alert-danger" role="alert"><%= errorMessage %></p>
+    <% } %>
+    <section class="pomi-admin-panel" aria-label="User accounts">
+      <div class="table-responsive">
+        <table class="table pomi-admin-users-table">
+          <thead>
+            <tr>
+              <th scope="col">User ID</th>
+              <th scope="col">Name</th>
+              <th scope="col">Username</th>
+              <th scope="col">Role</th>
+              <th scope="col">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% users.forEach(user => { %>
+              <tr>
+                <td><span class="pomi-admin-id">#<%= user.id %></span></td>
+                <td><strong><%= user.name %></strong></td>
+                <td><%= user.username %></td>
+                <td><span class="pomi-admin-role"><%= user.role %></span></td>
+                <td>
+                  <div class="pomi-admin-actions">
+                    <a class="pomi-admin-button pomi-admin-button-secondary" href="/admin/users/<%= user.id %>">View</a>
+                    <a class="pomi-admin-button pomi-admin-button-primary" href="/admin/users/<%= user.id %>/edit">Edit</a>
+                    <a class="pomi-admin-button pomi-admin-button-danger" href="/admin/users/<%= user.id %>/delete">Delete</a>
+                  </div>
+                </td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

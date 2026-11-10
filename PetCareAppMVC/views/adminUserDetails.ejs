@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>User Details | Pomi Admin</title>
+</head>
+<body>
+  <%- include('partials/navbar') %>
+  <main class="pomi-admin-content">
+    <a class="medical-back-link" href="/admin/users">← Users &amp; pets</a>
+    <header class="pomi-admin-dashboard-header">
+      <div>
+        <p class="pomi-admin-dashboard-kicker">Management · User details</p>
+        <h1><%= user.name %></h1>
+        <p><%= user.username %> · <%= user.role %> account · User ID #<%= user.id %></p>
+      </div>
+      <a class="pomi-admin-button pomi-admin-button-primary" href="/admin/users/<%= user.id %>/edit">Edit user</a>
+    </header>
+    <% if (successMessage) { %>
+      <p class="pomi-admin-alert pomi-admin-alert-success" role="status"><%= successMessage %></p>
+    <% } %>
+    <% if (errorMessage) { %>
+      <p class="pomi-admin-alert pomi-admin-alert-danger" role="alert"><%= errorMessage %></p>
+    <% } %>
+
+    <section class="pomi-admin-pet-section" aria-labelledby="registered-pets-title">
+      <header class="pomi-admin-section-heading">
+        <div>
+          <p class="pomi-admin-dashboard-kicker">Owner records</p>
+          <h2 id="registered-pets-title">Registered pets <span class="pomi-admin-count"><%= pets.length %></span></h2>
+        </div>
+      </header>
+      <% if (pets.length === 0) { %>
+        <div class="pomi-admin-panel pomi-admin-empty">This user has no registered pets.</div>
+      <% } else { %>
+        <div class="pomi-admin-pet-grid">
+          <% pets.forEach(pet => { %>
+            <article class="pomi-admin-pet-card<%= pet.status === 'deceased' ? ' is-deceased' : '' %>">
+              <% if (pet.imageUrl) { %>
+                <img class="pomi-admin-pet-image" src="<%= pet.imageUrl %>" alt="Photo of <%= pet.name %>" loading="lazy">
+              <% } else { %>
+                <div class="pomi-admin-pet-image pomi-admin-pet-image-empty" role="img" aria-label="No photo on file for <%= pet.name %>">No photo on file</div>
+              <% } %>
+              <div class="pomi-admin-pet-content">
+                <div class="pomi-admin-pet-title">
+                  <div>
+                    <h3><%= pet.name %></h3>
+                    <p><%= pet.species %> · <%= pet.breed %></p>
+                  </div>
+                  <span class="pomi-admin-status<%= pet.status === 'deceased' ? ' is-deceased' : '' %>">
+                    <%= pet.status === 'deceased' ? 'Deceased' : 'Active' %>
+                  </span>
+                </div>
+                <dl class="pomi-admin-pet-facts">
+                  <div><dt>Age</dt><dd><%= pet.age %> <%= Number(pet.age) === 1 ? 'year' : 'years' %></dd></div>
+                  <div><dt>Pomi Pet ID</dt><dd>#<%= pet.id %></dd></div>
+                  <div><dt>AVS licence</dt><dd><%= pet.avs_licence_number || 'Not recorded' %></dd></div>
+                  <div><dt>Microchip ID (MID)</dt><dd><%= pet.microchip_id || 'Not recorded' %></dd></div>
+                </dl>
+                <div class="pomi-admin-actions">
+                  <a class="pomi-admin-button pomi-admin-button-secondary" href="/admin/pets/<%= pet.id %>">View pet</a>
+                  <a class="pomi-admin-button pomi-admin-button-primary" href="/admin/pets/<%= pet.id %>/edit">Edit pet</a>
+                  <% if (pet.status === 'active') { %>
+                    <a class="pomi-admin-button pomi-admin-button-danger" href="/admin/pets/<%= pet.id %>/deceased">Mark as deceased</a>
+                  <% } %>
+                </div>
+              </div>
+            </article>
+          <% }) %>
+        </div>
+      <% } %>
+    </section>
+  </main>
+</body>
+</html>

@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title><%= product.id ? 'Edit' : 'Create' %> Product | Pomi</title>
+  <script src="/js/pet-shop.js" defer></script>
+</head>
+<body class="shop-page shop-admin-page">
+  <%- include('partials/navbar') %>
+  <% const selectedSpecies = Array.isArray(product.species_suitability)
+    ? product.species_suitability
+    : typeof product.species_suitability === 'string'
+      ? product.species_suitability.split(',').map(value => value.trim())
+      : []; %>
+  <main class="shop-admin-shell shop-admin-form-shell">
+    <a class="shop-back-link" href="/admin/products">← Product management</a>
+    <header class="shop-admin-heading">
+      <div>
+        <p class="shop-eyebrow">Admin workspace · Product listing</p>
+        <h1><%= product.id ? 'Edit product' : 'Create product' %></h1>
+        <p>Information entered here is a supplier submission or internal review record. Never imply official endorsement.</p>
+      </div>
+    </header>
+    <% if (errorMessage) { %><p class="shop-notice shop-notice-error" role="alert"><%= errorMessage %></p><% } %>
+    <form class="shop-admin-form" method="post" enctype="multipart/form-data" action="<%= product.id ? `/admin/products/${product.id}` : '/admin/products' %>">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+
+      <fieldset>
+        <legend><span class="shop-form-section-index">01</span> Basic Product Information</legend>
+        <div class="shop-form-grid">
+          <label class="shop-form-wide">Product name
+            <input name="product_name" maxlength="180" required value="<%= product.product_name || '' %>">
+          </label>
+          <label>Brand
+            <input name="brand" list="knownProductBrands" maxlength="120" value="<%= product.brand || '' %>" data-product-brand>
+            <datalist id="knownProductBrands"><% brandSuggestions.forEach(brandName => { %><option value="<%= brandName %>"><% }); %></datalist>
+          </label>
+          <label>Internal product category
+            <select id="productCategory" name="category_id" required>
+              <option value="">Choose category</option>
+              <% categories.filter(category => Number(category.is_active) === 1).forEach(category => { %>
+                <option value="<%= category.id %>" data-category-code="<%= category.category_code %>" <%= Number(product.category_id) === category.id ? 'selected' : '' %>><%= category.category_name %></option>
+              <% }); %>
+            </select>
+          </label>
+          <label>Price (SGD)
+            <input name="price_sgd" type="number" min="0" max="99999999.99" step="0.01" required value="<%= product.price_sgd || '' %>">
+          </label>
+          <label>Stock quantity
+            <input name="stock_quantity" type="number" min="0" max="1000000" step="1" required value="<%= product.stock_quantity ?? 0 %>">
+          </label>
+          <div class="shop-prescription-control shop-form-wide" data-prescription-control <%= categories.find(category => Number(category.id) === Number(product.category_id))?.category_code === 'animal-medical-healthcare' ? '' : 'hidden' %>>
+            <label class="shop-form-check"><input name="is_prescription_product" type="checkbox" value="1" <%= Number(product.is_prescription_product) === 1 ? 'checked' : '' %>> Prescription-only medicine</label>
+            <input type="hidden" name="prescription_flag_fallback" value="<%= Number(product.is_prescription_product) === 1 ? '1' : '0' %>" data-prescription-fallback <%= categories.find(category => Number(category.id) === Number(product.category_id))?.category_code === 'animal-medical-healthcare' ? 'disabled' : '' %>>
+            <p class="shop-disclaimer">Products requiring a veterinary prescription cannot be listed for sale in the CA1 Pet Shop.</p>
+          </div>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend><span class="shop-form-section-index">02</span> Storefront Placement</legend>
+        <div class="shop-form-grid">
+          <label>Display Product Under
+            <select name="storefront_placement" data-storefront-placement required>
+              <option value="" <%= product.storefront_placement ? '' : 'selected' %>><%= product.id ? 'Not on storefront (internal only)' : 'Choose storefront placement' %></option>
+              <option value="pethub_products" <%= product.storefront_placement === 'pethub_products' ? 'selected' : '' %>>PetHub Products</option>
+              <option value="trusted_cats_dogs" <%= product.storefront_placement === 'trusted_cats_dogs' ? 'selected' : '' %>>Trusted Brands — Cats & Dogs</option>
+              <option value="trusted_small_furries" <%= product.storefront_placement === 'trusted_small_furries' ? 'selected' : '' %>>Trusted Brands — Small Furries</option>
+            </select>
+            <small>Existing products can remain internal-only until a storefront is selected.</small>
+          </label>
+          <label data-trusted-brand-field>Trusted Brand selection
+            <select name="trusted_brand_name" data-trusted-brand>
+              <option value="">Choose a trusted brand when applicable</option>
+              <% trustedBrands.forEach(brand => { %>
+                <option value="<%= brand.brand_name %>" data-brand-group="<%= brand.storefront_group %>" <%= (product.trusted_brand_name || product.brand) === brand.brand_name ? 'selected' : '' %>><%= brand.brand_name %></option>
+              <% }); %>
+            </select>
+            <small>Only brands from the matching group are accepted for Trusted Brand placements.</small>
+          </label>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend><span class="shop-form-section-index">03</span> Animal Suitability</legend>
+        <div class="shop-form-grid">
+          <fieldset class="shop-species-fieldset shop-form-wide">
+            <legend>Animal species <span class="shop-field-note">Select every species explicitly supported by this product</span></legend>
+            <div class="shop-species-grid">
+              <% speciesOptions.forEach(species => { %>
+                <label class="shop-species-option">
+                  <input type="checkbox" name="species_suitability" value="<%= species %>" <%= selectedSpecies.some(value => value.toLocaleLowerCase('en-SG').replace(/[-_]+/g, ' ').replace(/\s+/g, ' ') === species.toLocaleLowerCase('en-SG')) ? 'checked' : '' %>>
+                  <span><%= species %></span>
+                </label>
+              <% }); %>
+            </div>
+            <small>Suitability must be confirmed for each species; selecting one species does not imply suitability for related animals.</small>
+          </fieldset>
+          <label>Age suitability
+            <select name="age_suitability" data-age-suitability>
+              <option value="none" <%= product.minimum_age_months == null && product.maximum_age_months == null ? 'selected' : '' %>>No age limit recorded</option>
+              <option value="range" <%= product.minimum_age_months != null || product.maximum_age_months != null ? 'selected' : '' %>>Record suitable age in months</option>
+            </select>
+          </label>
+          <label data-age-range-field>Minimum suitable age (months)
+            <input name="minimum_age_months" type="number" min="0" max="65535" step="<%= ageMonthStep %>" value="<%= product.minimum_age_months ?? '' %>">
+          </label>
+          <label data-age-range-field>Maximum suitable age (months)
+            <input name="maximum_age_months" type="number" min="0" max="65535" step="<%= ageMonthStep %>" value="<%= product.maximum_age_months ?? '' %>">
+          </label>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend><span class="shop-form-section-index">04</span> Product Information</legend>
+        <div class="shop-form-grid">
+          <label class="shop-form-wide">Description
+            <textarea name="description" rows="4" maxlength="10000" required><%= product.description || '' %></textarea>
+          </label>
+          <label class="shop-form-wide">Intended purpose
+            <textarea name="intended_purpose" rows="3" maxlength="500"><%= product.intended_purpose || '' %></textarea>
+          </label>
+          <label>Ingredients or materials
+            <textarea name="ingredients_materials" rows="4" maxlength="10000"><%= product.ingredients_materials || '' %></textarea>
+          </label>
+          <label>Usage instructions
+            <textarea name="usage_instructions" rows="4" maxlength="5000"><%= product.usage_instructions || '' %></textarea>
+          </label>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend><span class="shop-form-section-index">05</span> Safety and Availability</legend>
+        <div class="shop-form-grid">
+          <label>Expiry date, when applicable
+            <input name="expiry_date" type="date" value="<%= product.expiry_date ? new Date(product.expiry_date).toISOString().slice(0, 10) : '' %>">
+          </label>
+          <label>Internal listing review status
+            <select name="internal_review_status" required>
+              <% reviewStatuses.forEach(status => { %><option value="<%= status %>" <%= (product.internal_review_status || 'pending_review') === status ? 'selected' : '' %>><%= status.replace(/_/g, ' ') %></option><% }); %>
+            </select>
+          </label>
+          <label>Safety review status
+            <select name="safety_review_status" required>
+              <% safetyStatuses.forEach(status => { %><option value="<%= status %>" <%= (product.safety_review_status || 'pending') === status ? 'selected' : '' %>><%= status %></option><% }); %>
+            </select>
+          </label>
+          <label class="shop-form-check shop-active-listing"><input name="is_active" type="checkbox" value="1" <%= Number(product.is_active) === 1 ? 'checked' : '' %>> Active listing</label>
+
+          <h3 class="shop-form-subheading shop-form-wide">Supplier and submitted references</h3>
+          <label>Supplier name
+            <input name="supplier_name" maxlength="180" value="<%= product.supplier_name || '' %>">
+          </label>
+          <label>Supplier reference
+            <input name="supplier_reference" maxlength="500" value="<%= product.supplier_reference || '' %>">
+          </label>
+          <label>Country of origin
+            <input name="country_of_origin" maxlength="120" value="<%= product.country_of_origin || '' %>">
+          </label>
+          <label>Submitted licence number
+            <input name="submitted_licence_number" maxlength="180" value="<%= product.submitted_licence_number || '' %>">
+          </label>
+          <label class="shop-form-wide">Supporting document reference
+            <textarea name="supporting_document_reference" rows="2" maxlength="1000"><%= product.supporting_document_reference || '' %></textarea>
+          </label>
+          <label class="shop-form-wide">Regulatory authority reference
+            <textarea name="regulatory_authority_reference" rows="2" maxlength="500"><%= product.regulatory_authority_reference || '' %></textarea>
+          </label>
+        </div>
+        <p class="shop-disclaimer">Active products must be approved for internal listing and have cleared safety review. Expired products and items without stock cannot be added to carts.</p>
+      </fieldset>
+
+      <fieldset>
+        <legend><span class="shop-form-section-index">06</span> Product Photographs</legend>
+        <% if (product.images && product.images.length) { %>
+          <div class="shop-admin-image-list">
+            <% product.images.forEach(image => { %><img src="<%= image.image_path %>" alt="<%= image.alt_text %>" loading="lazy"><% }); %>
+          </div>
+        <% } %>
+        <label>Add images (JPEG, PNG or WebP; up to 5 MB each, max 5 files)
+          <input name="images" type="file" accept="image/jpeg,image/png,image/webp" multiple data-product-image-upload>
+        </label>
+        <div class="shop-upload-preview" data-product-image-preview aria-live="polite"></div>
+        <p class="shop-disclaimer">Use images that represent the actual product listing. If none are available, the storefront will clearly state that a product photo has not been supplied.</p>
+        <% if (product.documents && product.documents.length) { %>
+          <h3 class="shop-form-subheading shop-document-heading">Private supplier documents</h3>
+          <ul class="shop-document-list">
+            <% product.documents.forEach(document => { %>
+              <li><a href="/admin/products/<%= product.id %>/documents/<%= document.id %>"><%= document.document_title %></a> · <%= new Date(document.created_at).toLocaleDateString() %></li>
+            <% }); %>
+          </ul>
+        <% } %>
+        <label>Add private supplier documents (PDF only, up to 5 MB each, max 5 files)
+          <input name="supporting_documents" type="file" accept="application/pdf" multiple>
+        </label>
+        <p class="shop-disclaimer">Documents are kept outside the public directory and only downloadable by an authenticated Admin.</p>
+      </fieldset>
+
+      <p class="shop-disclaimer">PetHub Products are shown only when explicitly selected above. Existing products remain unclassified until an Admin assigns a storefront placement.</p>
+      <div class="shop-admin-actions shop-form-actions">
+        <a class="shop-button shop-button-quiet" href="/admin/products">Cancel</a>
+        <button class="shop-button shop-button-dark" type="submit">Save Product</button>
+      </div>
+    </form>
+  </main>
+</body>
+</html>

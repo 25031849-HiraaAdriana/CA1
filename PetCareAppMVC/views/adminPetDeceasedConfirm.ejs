@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Confirm Pet Status | Pomi Admin</title>
+</head>
+<body>
+  <%- include('partials/navbar') %>
+  <main class="pomi-admin-content">
+    <a class="medical-back-link" href="/admin/users/<%= pet.owner_id %>">← Owner details · <%= pet.owner_name %></a>
+    <header class="pomi-admin-dashboard-header">
+      <div>
+        <p class="pomi-admin-dashboard-kicker">Internal Pomi status</p>
+        <h1>Mark <%= pet.name %> as deceased?</h1>
+        <p>Pet ID #<%= pet.id %> · Owner <%= pet.owner_name %></p>
+      </div>
+    </header>
+    <section class="pomi-admin-panel pomi-admin-confirm-panel">
+      <% if (errorMessage) { %><p class="pomi-admin-alert pomi-admin-alert-danger" role="alert"><%= errorMessage %></p><% } %>
+      <p>This archives the pet from active owner listings. Its Pomi Pet ID, ownership link, medical records, private originals, signatures, appointments and refill history are retained. The action does not deregister the pet with AVS/PALS or change official licensing records.</p>
+      <form method="post" action="/admin/pets/<%= pet.id %>/deceased" class="pomi-admin-form">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+        <label class="pomi-admin-field">
+          <span>Type <strong><%= pet.name %></strong> to confirm</span>
+          <input type="text" name="confirm_pet_name" autocomplete="off" required>
+        </label>
+        <label class="pomi-admin-check">
+          <input type="checkbox" name="confirm_deceased" value="yes" required>
+          <span>I confirm this internal Pomi status change for <strong><%= pet.name %></strong>, owned by <strong><%= pet.owner_name %></strong>.</span>
+        </label>
+        <div class="pomi-admin-actions">
+          <button class="pomi-admin-button pomi-admin-button-danger" type="submit">Confirm deceased status</button>
+          <a class="pomi-admin-button pomi-admin-button-secondary" href="/admin/users/<%= pet.owner_id %>">Cancel</a>
+        </div>
+      </form>
+    </section>
+  </main>
+</body>
+</html>

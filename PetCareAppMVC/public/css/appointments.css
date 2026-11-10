@@ -1,0 +1,43 @@
+.appointment-header { display: flex; justify-content: space-between; align-items: flex-end; gap: 20px; }
+.appointment-header > div { max-width: 720px; }
+.appointment-header p:not(.medical-eyebrow) { color: var(--medical-muted); line-height: 1.65; }
+.appointment-header .medical-button { flex-shrink: 0; }
+.appointment-section { margin: 20px 0; }
+.appointment-section h2 { font-size: 1.4rem; }
+.appointment-empty { color: var(--medical-muted); }
+.appointment-list { display: grid; gap: 10px; }
+.appointment-card { min-width: 0; padding: 16px 18px; background: #FFFFFF; border-color: #E5E7EB; }
+.appointment-summary { display: grid; grid-template-columns: minmax(0, 1fr) minmax(180px, 0.6fr); gap: 12px; }
+.appointment-card h2 { margin: 0; font-size: 1.15rem; overflow-wrap: anywhere; }
+.appointment-card p { margin: 5px 0; overflow-wrap: anywhere; }
+.appointment-date { font-weight: 700; }
+.appointment-notes { white-space: pre-wrap; overflow-wrap: anywhere; }
+.appointment-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: 10px; }
+.appointment-actions form { margin: 0; }
+.appointment-card .appointment-actions .medical-button { min-height: 36px; padding: 7px 12px; font-size: 0.85rem; }
+.appointment-search { display: flex; align-items: end; gap: 10px; flex-wrap: wrap; margin: 16px 0; }
+.appointment-search > div { flex: 1 1 250px; }
+.appointment-search label { display: block; font-weight: 700; margin-bottom: 6px; }
+.appointment-search input { width: 100%; padding: 10px; border: 1px solid var(--medical-border); border-radius: 8px; font: inherit; }
+.appointment-filters, .appointment-pagination { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin: 14px 0; }
+.appointment-filters a { padding: 7px 12px; color: var(--medical-ink); border: 1px solid var(--medical-border); border-radius: 8px; text-decoration: none; }
+.appointment-filters a.selected { color: white; background: var(--medical-ink); border-color: var(--medical-ink); }
+.appointment-pagination a, .owner-results a { color: var(--medical-accent-dark); font-weight: 700; }
+.owner-results { display: grid; gap: 8px; padding-left: 20px; }
+.selected-owner { margin: 16px 0; }
+.appointment-form { display: grid; gap: 10px; max-width: 700px; }
+.appointment-form label { display: block; font-weight: 700; margin-top: 8px; }
+.appointment-form input, .appointment-form select, .appointment-form textarea {
+  width: 100%; padding: 12px; border: 1px solid var(--medical-border); border-radius: 8px;
+  background: white; color: var(--medical-ink); font: inherit;
+}
+.appointment-form input:focus, .appointment-form select:focus, .appointment-form textarea:focus {
+  outline: 2px solid var(--medical-accent-dark); outline-offset: 2px;
+}
+.appointment-form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.appointment-form-row label { margin-bottom: 10px; }
+@media (max-width: 600px) {
+  .appointment-header { align-items: flex-start; flex-direction: column; }
+  .appointment-form-row { grid-template-columns: 1fr; }
+  .appointment-summary { grid-template-columns: 1fr; gap: 4px; }
+}

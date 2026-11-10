@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Confirm User Deletion | Pomi Admin</title>
+</head>
+<body>
+  <%- include('partials/navbar') %>
+  <main class="pomi-admin-content">
+    <a class="medical-back-link" href="/admin/users">← Users &amp; pets</a>
+    <header class="pomi-admin-dashboard-header">
+      <div>
+        <p class="pomi-admin-dashboard-kicker">Irreversible action</p>
+        <h1>Delete user account</h1>
+        <p>Review the account and its linked records before confirming.</p>
+      </div>
+    </header>
+    <section class="pomi-admin-panel pomi-admin-confirm-panel">
+      <% if (errorMessage) { %><p class="pomi-admin-alert pomi-admin-alert-danger" role="alert"><%= errorMessage %></p><% } %>
+      <h2><%= user.name %></h2>
+      <dl class="pomi-admin-user-summary">
+        <div><dt>Username</dt><dd><%= user.username %></dd></div>
+        <div><dt>User ID</dt><dd>#<%= user.id %></dd></div>
+        <div><dt>Role</dt><dd><%= user.role %></dd></div>
+      </dl>
+      <% if (Number(user.has_pets) > 0) { %>
+        <p class="pomi-admin-alert pomi-admin-alert-danger">
+          This account has registered pets and cannot be deleted. Pet ownership, medical records, signatures, appointments and refill history will not be removed.
+        </p>
+      <% } else { %>
+        <p class="pomi-admin-alert pomi-admin-alert-danger">
+          Deleting this account also deletes its shopping cart, favourites and recently viewed items through existing database cascades. Any protected records will cause deletion to be rejected; pet or medical history is never cascaded by this action.
+        </p>
+      <% } %>
+      <% if (canDelete) { %>
+        <form method="post" action="/admin/users/<%= user.id %>/delete" class="pomi-admin-form">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+          <label class="pomi-admin-field">
+            <span>Type <strong><%= user.username %></strong> to confirm</span>
+            <input type="text" name="confirm_username" autocomplete="off" required>
+          </label>
+          <div class="pomi-admin-actions">
+            <button class="pomi-admin-button pomi-admin-button-danger" type="submit">Delete account permanently</button>
+            <a class="pomi-admin-button pomi-admin-button-secondary" href="/admin/users">Cancel</a>
+          </div>
+        </form>
+      <% } else { %>
+        <a class="pomi-admin-button pomi-admin-button-secondary" href="/admin/users">Back to users</a>
+      <% } %>
+    </section>
+  </main>
+</body>
+</html>

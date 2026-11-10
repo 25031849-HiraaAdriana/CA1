@@ -1,0 +1,14 @@
+<section class="refill-reminder" aria-label="Medication Refill Payment Reminder">
+  <h2>Medication Refill Payment Reminder</h2>
+  <div class="refill-reminder-list">
+    <% refillReminders.forEach(refill => { %>
+      <article class="refill-reminder-item">
+        <strong><%= refill.medication_name %></strong>
+        <p><%= refill.pet_name %> · <%= refill.displayPrice %> demo quotation</p>
+        <p>Status: Ready for Test Payment</p>
+      </article>
+    <% }); %>
+  </div>
+  <p>Demo only: not clinical approval or medication supply. No stock is reserved. Payment is planned for CA2 and unavailable now.</p>
+  <a class="dashboard-button dashboard-button-primary" href="/refill-cart">View Demo Cart</a>
+</section>

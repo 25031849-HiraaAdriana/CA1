@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Admin accounts | Pomi</title><link href="/css/pethub-dashboard.css" rel="stylesheet"><link href="/css/pomi-security.css" rel="stylesheet"></head>
+<body class="pethub-page dashboard-page pomi-security-page">
+  <%- include('partials/navbar') %>
+  <main class="security-shell">
+    <section class="security-card" aria-labelledby="accounts-title">
+      <p class="security-eyebrow">Administration</p><h1 id="accounts-title">Admin accounts</h1>
+      <% if (error) { %><p class="security-alert" role="alert"><%= error %></p><% } %>
+      <% if (success) { %><p class="security-alert security-alert-success" role="status"><%= success %></p><% } %>
+      <p class="security-description">Only a fully authenticated Admin can provision another Admin. New accounts must enroll an authenticator before entering the workspace.</p>
+      <a class="security-button" href="/admin/accounts/new">Create Admin account</a>
+    </section>
+  </main>
+</body>
+</html>

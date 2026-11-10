@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Product Management | Pomi</title>
+</head>
+<body class="shop-page shop-admin-page">
+  <%- include('partials/navbar') %>
+  <main class="shop-admin-shell">
+    <header class="shop-admin-heading">
+      <div><p class="shop-eyebrow">Admin workspace</p><h1>Product management</h1><p>Review product details and internal listing readiness. No government approval is implied.</p></div>
+      <div class="shop-admin-actions">
+        <a class="shop-button shop-button-dark" href="/admin/products/new">Create product</a>
+      </div>
+    </header>
+    <% if (!migrationReady) { %>
+      <p class="shop-notice shop-notice-error" role="alert">Product tables are unavailable. Review and manually apply the required Pet Shop migrations, including <code>migrations/005_add_pet_shop_storefront_and_user_history.sql</code>.</p>
+    <% } else if (!products.length) { %>
+      <p class="shop-empty">No product listings yet. Create a listing to begin the internal review process. No demonstration products have been inserted.</p>
+    <% } else { %>
+      <div class="shop-admin-products-grid">
+        <% products.forEach(product => { %>
+          <article class="shop-admin-card shop-admin-product-card">
+            <div class="shop-admin-product-image">
+              <% if (product.image_path) { %>
+                <img src="<%= product.image_path %>" alt="<%= product.product_name %>" loading="lazy">
+              <% } else { %>
+                <span>No product image</span>
+              <% } %>
+            </div>
+            <div class="shop-admin-product-content">
+              <div class="shop-admin-product-title">
+                <h2><%= product.product_name %></h2>
+                <span class="shop-admin-brand-badge"><%= product.trusted_brand_name || product.brand || 'No brand' %></span>
+              </div>
+              <p class="shop-admin-product-category"><%= product.category_name %></p>
+              <dl class="shop-admin-product-details">
+                <div><dt>Price</dt><dd>SGD <%= Number(product.price_sgd).toFixed(2) %></dd></div>
+                <div><dt>Stock</dt><dd><%= product.stock_quantity %></dd></div>
+                <div><dt>Listing</dt><dd title="<%= product.internal_review_status.replace(/_/g, ' ') %>"><%= product.internal_review_status === 'approved_for_internal_listing'
+                  ? 'Approved'
+                  : product.internal_review_status.replace(/_/g, ' ') %></dd></div>
+                <div><dt>Safety</dt><dd><%= product.safety_review_status.replace(/_/g, ' ') %></dd></div>
+              </dl>
+              <details class="shop-admin-product-extra">
+                <summary>Expiry &amp; placement</summary>
+                <dl>
+                  <div><dt>Expiry</dt><dd><%= product.expiry_date ? new Date(product.expiry_date).toLocaleDateString() : 'Not applicable' %></dd></div>
+                  <div><dt>Placement</dt><dd><%= product.storefront_placement === 'pethub_products'
+                    ? 'Pomi Products'
+                    : product.trusted_brand_name
+                      ? `${product.trusted_brand_name} · ${product.storefront_placement === 'trusted_cats_dogs' ? 'Cats & Dogs' : 'Small Furries'}`
+                      : 'Not on storefront' %></dd></div>
+                </dl>
+              </details>
+              <a class="shop-button shop-button-dark shop-admin-product-edit" href="/admin/products/<%= product.id %>/edit">Edit product</a>
+            </div>
+          </article>
+        <% }); %>
+      </div>
+    <% } %>
+  </main>
+</body>
+</html>

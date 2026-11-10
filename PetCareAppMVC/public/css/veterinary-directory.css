@@ -1,0 +1,369 @@
+.veterinary-directory-page {
+  min-height: 100vh;
+  margin: 0;
+  background: #F6F8FC;
+  color: #102A43;
+}
+
+.veterinary-directory-shell {
+  width: min(1120px, calc(100% - 48px));
+  margin: 0 auto;
+  padding: 34px 0 76px;
+}
+
+.veterinary-back-link {
+  color: #102A43;
+  font-size: 0.9rem;
+  font-weight: 650;
+  text-decoration: none;
+}
+
+.veterinary-back-link:hover,
+.veterinary-back-link:focus-visible {
+  text-decoration: underline;
+}
+
+.veterinary-page-heading {
+  max-width: 760px;
+  padding: 32px 0 26px;
+}
+
+.veterinary-eyebrow {
+  margin: 0 0 8px;
+  color: #102A43;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.veterinary-page-heading h1 {
+  margin: 0;
+  color: #102A43;
+  font-size: clamp(2rem, 4vw, 3.15rem);
+  letter-spacing: -0.045em;
+  line-height: 1.1;
+}
+
+.veterinary-page-heading > p:not(.veterinary-eyebrow) {
+  color: #6B7280;
+  line-height: 1.7;
+}
+
+.veterinary-before-visit {
+  margin-top: 20px;
+  padding: 18px 20px;
+  border: 1px solid #E5E7EB;
+  border-radius: 10px;
+  background: #F6F8FC;
+}
+
+.veterinary-before-visit h2 {
+  margin: 0 0 6px;
+  color: #102A43;
+  font-size: 1rem;
+  font-weight: 750;
+}
+
+.veterinary-before-visit p {
+  margin: 0;
+  color: #102A43;
+  font-size: 0.92rem;
+  line-height: 1.65;
+}
+
+.veterinary-filters,
+.veterinary-category-section {
+  margin-top: 24px;
+  padding: 24px;
+  border: 1px solid #E5E7EB;
+  border-radius: 16px;
+  background: #F6F8FC;
+  box-shadow: 0 14px 34px rgb(16 42 67 / 0.06);
+}
+
+.veterinary-filters {
+  display: grid;
+  gap: 20px;
+}
+
+.veterinary-filters fieldset {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.veterinary-filters legend {
+  margin-bottom: 10px;
+  color: #102A43;
+  font-size: 0.87rem;
+  font-weight: 750;
+}
+
+.veterinary-filter-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.veterinary-filter {
+  min-height: 38px;
+  padding: 7px 13px;
+  border: 1px solid #E5E7EB;
+  border-radius: 999px;
+  background: #FFFFFF;
+  color: #102A43;
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.86rem;
+}
+
+.veterinary-filter:hover {
+  border-color: #E5E7EB;
+}
+
+.veterinary-filter.is-selected {
+  border-color: #E5E7EB;
+  background: #102A43;
+  color: #FFFFFF;
+}
+
+.veterinary-filter:focus-visible,
+.veterinary-directions-link:focus-visible,
+.veterinary-source-link:focus-visible {
+  outline: 3px solid #6B7280;
+  outline-offset: 3px;
+}
+
+.veterinary-category-section[hidden],
+.veterinary-clinic-card[hidden] {
+  display: none;
+}
+
+.veterinary-section-heading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.veterinary-section-heading h2,
+.veterinary-category-section h2 {
+  margin: 0;
+  color: #102A43;
+  font-size: clamp(1.35rem, 2.5vw, 1.8rem);
+  letter-spacing: -0.03em;
+}
+
+.veterinary-eyebrow-emergency {
+  color: #102A43;
+}
+
+.veterinary-availability-label {
+  max-width: 310px;
+  color: #6B7280;
+  font-size: 0.8rem;
+  line-height: 1.5;
+  text-align: right;
+}
+
+.veterinary-clinic-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.veterinary-clinic-card {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding: 19px;
+  border: 1px solid #E5E7EB;
+  border-radius: 12px;
+  background: #FFFFFF;
+}
+
+.veterinary-clinic-emergency {
+  border-top: 3px solid #E5E7EB;
+}
+
+.veterinary-clinic-heading {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.veterinary-region-tag,
+.veterinary-emergency-tag,
+.veterinary-regular-tag {
+  display: inline-flex;
+  align-items: center;
+  min-height: 26px;
+  padding: 4px 9px;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.veterinary-region-tag {
+  background: #F6F8FC;
+  color: #102A43;
+}
+
+.veterinary-emergency-tag {
+  background: #F6F8FC;
+  color: #102A43;
+}
+
+.veterinary-regular-tag {
+  background: #F6F8FC;
+  color: #102A43;
+}
+
+.veterinary-clinic-card h3 {
+  margin: 14px 0 7px;
+  color: #102A43;
+  font-size: 1.06rem;
+  line-height: 1.35;
+}
+
+.veterinary-address,
+.veterinary-clinic-hours {
+  margin: 0 0 8px;
+  color: #6B7280;
+  font-size: 0.88rem;
+  line-height: 1.55;
+}
+
+.veterinary-clinic-hours {
+  min-height: 1.35em;
+  font-size: 0.81rem;
+}
+
+.veterinary-verification-note {
+  margin: 8px 0;
+  padding: 9px 10px;
+  border-left: 3px solid #E5E7EB;
+  border-radius: 0 6px 6px 0;
+  background: #F6F8FC;
+  color: #102A43;
+  font-size: 0.77rem;
+  line-height: 1.5;
+}
+
+.veterinary-phone {
+  margin: 3px 0 12px;
+}
+
+.veterinary-phone a {
+  color: #102A43;
+  font-size: 1.18rem;
+  font-weight: 780;
+  text-decoration: none;
+}
+
+.veterinary-phone-unverified {
+  margin: 3px 0 12px;
+  color: #102A43;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.veterinary-phone a:hover {
+  text-decoration: underline;
+}
+
+.veterinary-card-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: auto;
+}
+
+.veterinary-directions-link,
+.veterinary-source-link,
+.veterinary-action-unavailable {
+  display: inline-flex;
+  min-height: 39px;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 9px;
+  border-radius: 7px;
+  font-family: inherit;
+  font-size: 0.84rem;
+  font-weight: 700;
+  line-height: 1.25;
+  text-align: center;
+  text-decoration: none;
+}
+
+.veterinary-directions-link {
+  border: 1px solid #E5E7EB;
+  color: #102A43;
+}
+
+.veterinary-source-link {
+  border: 1px solid #E5E7EB;
+  color: #102A43;
+}
+
+.veterinary-directions-link:hover {
+  background: #F6F8FC;
+}
+
+.veterinary-action-unavailable {
+  border: 1px solid #E5E7EB;
+  background: #F6F8FC;
+  color: #102A43;
+  cursor: not-allowed;
+}
+
+.veterinary-verified-date {
+  margin: 8px 0 0;
+  color: #6B7280;
+  font-size: 0.72rem;
+}
+
+@media (max-width: 720px) {
+  .veterinary-directory-shell {
+    width: min(100% - 32px, 600px);
+    padding-top: 24px;
+  }
+
+  .veterinary-page-heading {
+    padding: 26px 0 18px;
+  }
+
+  .veterinary-filters,
+  .veterinary-category-section {
+    padding: 18px;
+  }
+
+  .veterinary-section-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .veterinary-availability-label {
+    text-align: left;
+  }
+
+  .veterinary-clinic-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

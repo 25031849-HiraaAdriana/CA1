@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Your Cart | Pomi</title>
+  <script src="/js/pet-shop.js" defer></script>
+</head>
+<body class="shop-page">
+  <%- include('partials/navbar') %>
+  <main class="shop-cart-page">
+    <header class="shop-cart-heading">
+      <p class="shop-eyebrow">Your considered collection</p>
+      <h1>Your cart</h1>
+      <a class="shop-text-link" href="/shop">Continue browsing <span aria-hidden="true">↗</span></a>
+      <a class="shop-text-link" href="/refill-cart">View medication refill demo cart</a>
+    </header>
+    <% if (successMessage) { %><p class="shop-notice" role="status"><%= successMessage %></p><% } %>
+    <% if (errorMessage) { %><p class="shop-notice shop-notice-error" role="alert"><%= errorMessage %></p><% } %>
+    <% if (!migrationReady) { %>
+      <p class="shop-empty">The cart is unavailable until an administrator reviews and applies <code>migrations/004_add_pet_shop.sql</code>.</p>
+    <% } else if (!items.length) { %>
+      <p class="shop-empty">Your cart is waiting for something thoughtful.</p>
+    <% } else { %>
+      <div class="shop-cart-layout">
+        <section class="shop-cart-items" aria-label="Cart items">
+          <% items.forEach(item => { %>
+            <article class="shop-cart-item <%= item.availabilityError ? 'is-unavailable' : '' %>">
+              <div class="shop-cart-image">
+                <% if (item.image_path) { %>
+                  <img src="<%= item.image_path %>" alt="<%= item.product_name %>" loading="lazy">
+                <% } else { %><span>Product photo not supplied</span><% } %>
+              </div>
+              <div class="shop-cart-item-info">
+                <p class="shop-product-brand"><%= item.brand || 'Pomi' %></p>
+                <h2><a href="/shop/products/<%= item.product_id %>"><%= item.product_name %></a></h2>
+                <p>SGD <%= Number(item.price_sgd).toFixed(2) %> each</p>
+                <% if (item.availabilityMessage) { %><p class="shop-notice-error"><%= item.availabilityMessage %></p><% } %>
+              </div>
+              <form class="shop-quantity-form" method="post" action="/cart/items/<%= item.cart_item_id %>/quantity">
+                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                <label for="quantity-<%= item.cart_item_id %>">Quantity</label>
+                <div class="shop-quantity-control">
+                  <button type="button" data-quantity-step="-1" aria-label="Decrease quantity">−</button>
+                  <input id="quantity-<%= item.cart_item_id %>" name="quantity" type="number" value="<%= item.quantity %>" min="1" max="99" <%= item.availabilityError ? 'readonly' : '' %>>
+                  <button type="button" data-quantity-step="1" aria-label="Increase quantity" <%= item.availabilityError ? 'disabled' : '' %>>+</button>
+                </div>
+                <% if (!item.availabilityError) { %><button class="shop-text-button" type="submit">Update quantity</button><% } %>
+              </form>
+              <div class="shop-cart-subtotal">
+                <span>Subtotal</span>
+                <strong>SGD <%= item.subtotalSgd %></strong>
+                <% if (item.availabilityError) { %><small>Excluded from cart total</small><% } %>
+                <form method="post" action="/cart/items/<%= item.cart_item_id %>/remove">
+                  <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                  <button class="shop-text-button" type="submit">Remove</button>
+                </form>
+              </div>
+            </article>
+          <% }); %>
+        </section>
+        <aside class="shop-cart-summary">
+          <p class="shop-eyebrow">Order summary</p>
+          <div><span>Cart total</span><strong>SGD <%= totalSgd %></strong></div>
+          <p>Prices use the current product listing. Stock is not reserved by adding an item to your cart.</p>
+          <p class="shop-disclaimer">This CA1 prototype ends at the shopping cart. Checkout and payment are not available.</p>
+        </aside>
+      </div>
+    <% } %>
+  </main>
+</body>
+</html>
