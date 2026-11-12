@@ -111,7 +111,7 @@
           <div class="field-group" data-microchip-field>
             <label for="microchip_id">Microchip ID (MID) <span class="optional-mark">Required for dogs, cats and pets with a microchip</span></label>
             <input type="text" class="form-control" id="microchip_id" name="microchip_id" maxlength="30" value="<%= formData.microchip_id || '' %>" autocomplete="off">
-            <span class="field-hint">Enter the ID exactly as recorded. It is treated as text, so leading zeros are kept.</span>
+            <span class="field-hint">For dogs and cats, enter exactly 15 digits without spaces or dashes. Leading zeros are kept.</span>
           </div>
           <div class="information-panel">
             <strong>Where can I find the MID?</strong>
@@ -195,7 +195,7 @@
 
           <div class="information-panel privacy-panel">
             <strong>How document matching works</strong>
-            <p>Pomi extracts the labelled licence number and Microchip ID from this PDF and compares them locally with your entries. Documents without extractable text are not accepted. The document is not sent to AVS/PALS; this check is not official verification or proof of ownership.</p>
+            <p>Pomi compares your pet's name, Microchip ID and AVS licence number with the corresponding fields in this PDF. The licence number and Microchip ID must be different. Documents without extractable text are not accepted. The document is checked locally, not sent to AVS/PALS; this is not official verification or proof of ownership.</p>
           </div>
           </div>
 

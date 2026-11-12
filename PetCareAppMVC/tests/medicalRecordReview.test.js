@@ -145,13 +145,14 @@ require.cache[medicalRecordModelPath] = {
 class InvalidMedicalDocumentError extends Error {}
 const actualDetectDocumentMimeType = require('../helpers/medicalDocumentExtraction').detectDocumentMimeType;
 let extractionCalls = 0;
+let extractionResult = { extractionStatus: 'successful', text: 'Validated mock document content' };
 const extraction = {
   InvalidMedicalDocumentError,
   detectDocumentMimeType: actualDetectDocumentMimeType,
   validateMedicalDocument: async () => {},
   extractMedicalDocumentText: async () => {
     extractionCalls += 1;
-    return { extractionStatus: 'successful', text: 'Validated mock document content' };
+    return extractionResult;
   },
   hasMeaningfulText(text) {
     const characters = String(text || '').replace(/\s+/g, '');
@@ -1041,6 +1042,8 @@ test('one-page publication submits ten medication entries through the signed rev
   const originalReady = adminActivityModel.isFeatureReady;
   const originalPublish = adminActivityModel.publishMedicalRecord;
   const originalCreate = medicalRecordModel.createDraftRecord;
+  const originalSupports = medicalRecordModel.supportsPublicationWithoutExtraction;
+  medicalRecordModel.supportsPublicationWithoutExtraction = async () => false;
   adminActivityModel.isFeatureReady = async () => true;
   let inserted;
   let publication;
@@ -1069,9 +1072,9 @@ test('one-page publication submits ten medication entries through the signed rev
     assert.equal(insertCount, 1);
     assert.equal(publication.medicationEntries.length, 10);
     assert.equal(publication.medicationEntries[9].medicationName, 'Medicine 10');
-    assert.equal(publication.reviewPayload.extractedText, '');
-    assert.equal(publication.recordSnapshot.extractionStatus, 'not_extracted');
-    assert.equal(publication.recordSnapshot.extractedText, null);
+    assert.equal(publication.reviewPayload.extractedText, 'Validated mock document content');
+    assert.equal(publication.recordSnapshot.extractionStatus, 'successful');
+    assert.equal(publication.recordSnapshot.extractedText, 'Validated mock document content');
     assert.equal(publication.enforceRecordVersion, true);
     assert.equal(publication.recordSnapshot.storageKey, inserted.storageKey);
     assert.deepEqual(publication.originalDocument, createPdfBytes());
@@ -1101,6 +1104,7 @@ test('one-page publication submits ten medication entries through the signed rev
     assert.match(uncertainHtml, /do not upload it again/i);
     assert.ok((await fs.stat(publication.signatureData.filePath)).isFile());
   } finally {
+    medicalRecordModel.supportsPublicationWithoutExtraction = originalSupports;
     medicalRecordModel.createDraftRecord = originalCreate;
     adminActivityModel.isFeatureReady = originalReady;
     adminActivityModel.publishMedicalRecord = originalPublish;
@@ -1147,7 +1151,7 @@ test('one-page publication requires Admin, CSRF, signature and valid medications
   }
 });
 
-test('one-page publication accepts each supported type in each category without OCR', async () => {
+test('one-page publication accepts each supported type in each category with extracted text', async () => {
   const cookie = await login('admin');
   const originalReady = adminActivityModel.isFeatureReady;
   const originalPublish = adminActivityModel.publishMedicalRecord;
@@ -1187,13 +1191,13 @@ test('one-page publication accepts each supported type in each category without 
         const response = await postPublication(cookie, form);
         assert.equal(response.status, 302, `${category} ${mime}`);
         assert.equal(inserted.documentMimeType, mime);
-        assert.equal(inserted.extractionStatus, 'not_extracted');
-        assert.equal(inserted.extractedText, null);
-        assert.equal(published.recordSnapshot.extractionStatus, 'not_extracted');
-        assert.equal(published.recordSnapshot.extractedText, null);
+        assert.equal(inserted.extractionStatus, 'successful');
+        assert.equal(inserted.extractedText, 'Validated mock document content');
+        assert.equal(published.recordSnapshot.extractionStatus, 'successful');
+        assert.equal(published.recordSnapshot.extractedText, 'Validated mock document content');
       }
     }
-    assert.equal(extractionCalls, initialExtractionCalls);
+    assert.equal(extractionCalls, initialExtractionCalls + 15);
   } finally {
     medicalRecordModel.createDraftRecord = originalCreate;
     adminActivityModel.isFeatureReady = originalReady;
@@ -1201,19 +1205,27 @@ test('one-page publication accepts each supported type in each category without 
   }
 });
 
-test('one-page publication fails before inserting if the database constraint has not been updated', async () => {
+test('one-page publication reports the extraction failure instead of a database message when the no-extraction constraint is absent', async () => {
   const cookie = await login('admin');
   const original = medicalRecordModel.supportsPublicationWithoutExtraction;
   const originalCreate = medicalRecordModel.createDraftRecord;
+  const originalResult = extractionResult;
+  const originalReady = adminActivityModel.isFeatureReady;
   let inserts = 0;
+  adminActivityModel.isFeatureReady = async () => true;
   medicalRecordModel.supportsPublicationWithoutExtraction = async () => false;
   medicalRecordModel.createDraftRecord = async () => { inserts += 1; };
   try {
+    extractionResult = { extractionStatus: 'failed_review_needed', text: '' };
     const response = await postPublication(cookie, await onePageForm(cookie));
-    assert.equal(response.status, 503);
-    assert.match(await response.text(), /required database change/i);
+    assert.equal(response.status, 422);
+    const html = await response.text();
+    assert.match(html, /No readable text could be extracted/i);
+    assert.doesNotMatch(html, /database change/i);
     assert.equal(inserts, 0);
   } finally {
+    adminActivityModel.isFeatureReady = originalReady;
+    extractionResult = originalResult;
     medicalRecordModel.supportsPublicationWithoutExtraction = original;
     medicalRecordModel.createDraftRecord = originalCreate;
   }

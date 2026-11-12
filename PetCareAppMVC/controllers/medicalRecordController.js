@@ -8,6 +8,7 @@ const {
   InvalidMedicalDocumentError,
   detectDocumentMimeType,
   validateMedicalDocument,
+  extractMedicalDocumentText,
   hasMeaningfulText
 } = require('../helpers/medicalDocumentExtraction');
 const {
@@ -371,7 +372,7 @@ async function updateDraftReview(req, res) {
   record.reviewVersion = getString(req.body && req.body.review_version);
   const action = getString(req.body && req.body.action);
   const recordDate = parseRecordDate(formData.recordDate);
-  const withoutExtraction = req.newPublication || record.extraction_status === 'not_extracted';
+  const withoutExtraction = record.extraction_status === 'not_extracted';
   const imageOnlyEligible = formData.categoryCode === 'x_rays_imaging' &&
     (record.document_mime_type === 'image/jpeg' || record.document_mime_type === 'image/png');
   const text = withoutExtraction ? '' : formData.extractedText.replace(/\0/g, '').replace(/\r\n/g, '\n');
@@ -968,9 +969,29 @@ async function createDraft(req, res) {
     });
   }
 
-  const extraction = { extractionStatus: 'not_extracted', text: null };
+  let extraction = { extractionStatus: 'not_extracted', text: null };
   try {
     await validateMedicalDocument(uploadedFile.buffer, documentMimeType);
+    if (req.newPublication) {
+      let extracted = null;
+      try {
+        extracted = await extractMedicalDocumentText(uploadedFile.buffer, documentMimeType);
+      } catch (extractionError) {
+        console.error('Medical document extraction failed:', extractionError.code || 'UNKNOWN');
+      }
+      if (extracted && extracted.extractionStatus === 'successful' && hasMeaningfulText(extracted.text)) {
+        extraction = { extractionStatus: 'successful', text: extracted.text.replace(/\0/g, '') };
+      } else if (!await medicalRecordModel.supportsPublicationWithoutExtraction()) {
+        return renderNewRecordForm(req, res, {
+          formData,
+          petId,
+          statusCode: 422,
+          errorMessage: extracted
+            ? 'No readable text could be extracted from this document, so it cannot be published. Upload a text-based PDF or a clearer scan.'
+            : 'The document text could not be extracted, so it cannot be published. Try a different copy of the document.'
+        });
+      }
+    }
   } catch (error) {
     if (error instanceof InvalidMedicalDocumentError) {
       return renderNewRecordForm(req, res, {
@@ -1106,12 +1127,6 @@ async function publishNewRecord(req, res) {
     }
   }
   try {
-    if (!await medicalRecordModel.supportsPublicationWithoutExtraction()) {
-      return renderNewRecordForm(req, res, {
-        statusCode: 503,
-        errorMessage: 'Publishing without document extraction is not yet available. An administrator must review and approve the required database change.'
-      });
-    }
     if (!await adminActivityModel.isFeatureReady()) {
       return renderNewRecordForm(req, res, {
         statusCode: 503,

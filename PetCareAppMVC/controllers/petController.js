@@ -8,8 +8,7 @@ const speciesNames = {
   dog: 'Dog', cat: 'Cat', rabbit: 'Rabbit', hamster: 'Hamster', 'guinea pig': 'Guinea Pig'
 };
 
-const unreadableDocumentMessage = 'Registration Unsuccessful. Unable to verify both identifiers against the uploaded document.';
-const mismatchedDocumentMessage = 'Registration Unsuccessful. The AVS licence number or Microchip ID does not match the uploaded document.';
+const unreadableDocumentMessage = 'Registration unsuccessful. Unable to read the PDF. Please upload a readable document containing the pet name, Microchip ID, and AVS licence number.';
 const invalidDocumentMessage = 'Registration Unsuccessful. Please upload the AVS licence document as a PDF.';
 
 function getRegistrationFormData(req) {
@@ -53,9 +52,8 @@ async function createPet(req, res) {
   const avsLicenceNumber = typeof req.body.avs_licence_number === 'string'
     ? req.body.avs_licence_number.trim()
     : '';
-  const microchipId = typeof req.body.microchip_id === 'string'
-    ? req.body.microchip_id.trim()
-    : '';
+  const enteredMicrochipId = typeof req.body.microchip_id === 'string' ? req.body.microchip_id : '';
+  const microchipId = requiresLicence ? enteredMicrochipId : enteredMicrochipId.trim();
   const ageValue = typeof req.body.age === 'string' ? req.body.age.trim() : '';
   const age = ageValue === '' ? NaN : Number(ageValue);
   const petDetailsAreInvalid =
@@ -74,6 +72,14 @@ async function createPet(req, res) {
   }
 
   const hasMicrochip = req.body.has_microchip;
+  if (requiresLicence && microchipId && !/^[0-9]{15}$/.test(microchipId)) {
+    return renderRegistrationForm(req, res, {
+      statusCode: 400,
+      resultMessage: 'Microchip ID must contain exactly 15 digits.',
+      resultType: 'danger',
+      initialStep: 2
+    });
+  }
   if (microchipId.length > 30 || avsLicenceNumber.length > 50 ||
       (!requiresLicence && microchipId &&
         (!/^[A-Za-z0-9][A-Za-z0-9._/-]*$/.test(microchipId) || !/\d/.test(microchipId))) ||
@@ -107,32 +113,60 @@ async function createPet(req, res) {
   if (requiresLicence && !documentFile) {
     return renderRegistrationForm(req, res, {
       statusCode: 400,
-      resultMessage: unreadableDocumentMessage,
+      resultMessage: 'Registration unsuccessful. Please upload the required AVS licence PDF.',
       resultType: 'danger'
     });
   }
 
   if (requiresLicence) {
+    if (avsLicenceNumber === microchipId) {
+      return renderRegistrationForm(req, res, {
+        statusCode: 400,
+        resultMessage: 'Registration Unsuccessful. The AVS licence number and Microchip ID must be different.',
+        resultType: 'danger'
+      });
+    }
     let extractedIdentifiers;
     try {
-      extractedIdentifiers = await avsLicenceDocument.extractIdentifiers(documentFile.buffer);
-    } catch {
+      extractedIdentifiers = await avsLicenceDocument.extractRegistrationFields(documentFile.buffer);
+    } catch (error) {
+      const unsupportedMessage = error.code === 'PDF_NO_TEXT'
+        ? 'Registration unsuccessful. Scanned or image-only PDF pages are not supported. Please upload a text-based PDF.'
+        : error.code === 'PDF_PAGE_LIMIT'
+          ? 'Registration unsuccessful. The PDF must contain between 1 and 20 pages.'
+          : error.code === 'PDF_LAYOUT_UNSUPPORTED'
+            ? 'Registration unsuccessful. This PDF layout cannot be read reliably. Please upload a text-based PDF with clearly separated fields.'
+          : unreadableDocumentMessage;
+      console.error('AVS licence PDF extraction failed:', error.code || error.name || 'UNKNOWN');
       documentFile.buffer = undefined;
       return renderRegistrationForm(req, res, {
-        statusCode: 400, resultMessage: unreadableDocumentMessage, resultType: 'danger'
+        statusCode: 400, resultMessage: unsupportedMessage, resultType: 'danger'
       });
     }
     documentFile.buffer = undefined;
 
-    if (!extractedIdentifiers.avsLicenceNumber || !extractedIdentifiers.microchipId) {
+    const missingFields = [];
+    if (!extractedIdentifiers.petName) missingFields.push('pet name');
+    if (!extractedIdentifiers.microchipId) missingFields.push('Microchip ID');
+    if (!extractedIdentifiers.avsLicenceNumber) missingFields.push('AVS licence number');
+    if (missingFields.length) {
       return renderRegistrationForm(req, res, {
-        statusCode: 400, resultMessage: unreadableDocumentMessage, resultType: 'danger'
+        statusCode: 400,
+        resultMessage: `Registration unsuccessful. The PDF has missing, ambiguous or unreadable information: ${missingFields.join(', ')}.`,
+        resultType: 'danger'
       });
     }
-    if (extractedIdentifiers.avsLicenceNumber.trim() !== avsLicenceNumber ||
-        extractedIdentifiers.microchipId.trim() !== microchipId) {
+    const mismatchedFields = [];
+    if (extractedIdentifiers.petName.trim().toLowerCase() !== petName.toLowerCase()) {
+      mismatchedFields.push('pet name');
+    }
+    if (extractedIdentifiers.microchipId.trim() !== microchipId) mismatchedFields.push('Microchip ID');
+    if (extractedIdentifiers.avsLicenceNumber.trim() !== avsLicenceNumber) mismatchedFields.push('AVS licence number');
+    if (mismatchedFields.length) {
       return renderRegistrationForm(req, res, {
-        statusCode: 400, resultMessage: mismatchedDocumentMessage, resultType: 'danger'
+        statusCode: 400,
+        resultMessage: `Registration Unsuccessful. The following ${mismatchedFields.length === 1 ? 'field does' : 'fields do'} not match the uploaded document: ${mismatchedFields.join(', ')}.`,
+        resultType: 'danger'
       });
     }
   }
